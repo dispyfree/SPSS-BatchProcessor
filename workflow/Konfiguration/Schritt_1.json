@@ -1,0 +1,21 @@
+{
+    "defaultConfigDir": "C:/Users/admin/Documents/valentin/SPSS/toolbox/SPSSToolbox/batchProcessor/workflow/Konfiguration", 
+    "defaultInputDir": "C:/Users/admin/Documents/valentin/SPSS/toolbox/SPSSToolbox/batchProcessor/test/in", 
+    "defaultOutDir": "C:/Users/admin/Documents/valentin/SPSS/toolbox/SPSSToolbox/batchProcessor/test/out", 
+    "defaultSPSSDir": "C:/Users/admin/Documents/valentin/SPSS/toolbox/SPSSToolbox/batchProcessor/workflow", 
+    "inputRegexPattern": "pb(?P<Probandennummer>[\\w]*).txt", 
+    "inputSearchPattern": ".txt", 
+    "outputDir": "C:/Users/admin/Documents/valentin/SPSS/toolbox/SPSSToolbox/batchProcessor/test/out", 
+    "outputFilePattern": "pb<Probandennummer>.sav", 
+    "placeholders": {
+        "DUMMY": "DUMMY", 
+        "INFILE": "C:/Users/admin/Documents/valentin/SPSS/toolbox/SPSSToolbox/batchProcessor/test/in/pb123_fair.txt", 
+        "INPUTDIR": "C:/Users/admin/Documents/valentin/SPSS/toolbox/SPSSToolbox/batchProcessor/test/in/", 
+        "OUTPUTDIR": "C:/Users/admin/Documents/valentin/SPSS/toolbox/SPSSToolbox/batchProcessor/test/out/", 
+        "OUTPUTFILE": "", 
+        "fileName": "pb123_fair.txt"
+    }, 
+    "programVersion": 0.8, 
+    "simulateProcessing": false, 
+    "spssFile": "C:/Users/admin/Documents/valentin/SPSS/toolbox/SPSSToolbox/batchProcessor/workflow/Schritt_1_Einlesen_TxtDatei_in_SavDatei_Umwandeln.sps"
+}

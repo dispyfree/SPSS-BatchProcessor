@@ -1,0 +1,18 @@
+{
+    "defaultConfigDir": ".", 
+    "defaultInputDir": "C:/Users/admin/Documents/valentin/SPSS/toolbox/SPSSToolbox/batchProcessor/test/out", 
+    "defaultOutDir": "C:/Users/admin/Documents/valentin/SPSS/toolbox/SPSSToolbox/batchProcessor/test/out", 
+    "defaultSPSSDir": "C:/Users/admin/Documents/valentin/SPSS/toolbox/SPSSToolbox/batchProcessor/workflow", 
+    "inputRegexPattern": "(?P<fileName>[\\w]*).sav", 
+    "inputSearchPattern": ".txt", 
+    "outputDir": "C:/Users/admin/Documents/valentin/SPSS/toolbox/SPSSToolbox/batchProcessor/test/out", 
+    "outputFilePattern": "<fileName>.sav", 
+    "placeholders": {
+        "DUMMY": "DUMMY", 
+        "INFILE": "", 
+        "OUTPUTFILE": ""
+    }, 
+    "programVersion": 0.8, 
+    "simulateProcessing": false, 
+    "spssFile": "C:/Users/admin/Documents/valentin/SPSS/toolbox/SPSSToolbox/batchProcessor/workflow/Schritt_2_Zusammenf\u00fcgen_der_SavDateien.sps"
+}
