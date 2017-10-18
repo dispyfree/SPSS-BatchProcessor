@@ -5,9 +5,11 @@ import tkinter.ttk as ttk
 import json
 
 import configparser, os
+from Configuration import Configuration
 
 from multiprocessing import Process, Queue
 from BatchProcessorGUI import BatchProcessorGUI
+from batchProcessor import BatchProcessor
 
 from Lang import Lang
 

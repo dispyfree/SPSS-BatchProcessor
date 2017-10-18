@@ -64,10 +64,7 @@ class BatchProcessorGUI:
         # select nice style, if possible
         s = ttk.Style(parent)
         styles = s.theme_names()
-        if 'clam' in styles:
-            s.theme_use('clam');
-            s.configure("TLabel", background="SystemButtonFace",
-                        color='black')
+
         s.configure('TLabel', bg='white')
         s.configure('TNotebook', background = '#ffffff')
         s.configure('TNotebook.Tab', background='#ffffff')
@@ -174,30 +171,36 @@ class BatchProcessorGUI:
         self.executionPane = tk.Frame(self.notebook)
         self.executionPane.configure(background='white')
 
+        #maximum space it will take up
+        portionOfScreenWidth = self.w - 200
+        tk.Label(self.executionPane, text=Lang.get("runDescription"),
+                    **self.getItemStyle(), wraplength = portionOfScreenWidth,
+                 justify= tkinter.LEFT).grid(row=0, column=0, columnspan = 6, sticky=tk.W);
+
+        # progress bar
+        self.pb = ttk.Progressbar(self.executionPane, orient="horizontal", length=portionOfScreenWidth,mode="determinate");
+        self.pb.grid(row=2, column=0, sticky=tk.W + tk.E, columnspan=6)
+
         # Simulate
         self.simulateProcessingVar = tk.IntVar()
         self.simulateProcessingVar.set(0);  # defaults to no simulation
         self.simulateButton = tk.Checkbutton(self.executionPane, text=Lang.get("Simulate"),
                                              variable=self.simulateProcessingVar,
                                              indicatoron=0, **self.getItemStyle());
-        self.simulateButton.grid(row=1, column=3, sticky=tk.W + tk.E)
-
-
-        # progress bar
-        self.pb = ttk.Progressbar(self.executionPane, orient="horizontal", length=200,
-                                  mode="determinate");
-        self.pb.grid(row=5, column=0, sticky=tk.W + tk.E, columnspan=3)
-
-        self.remainingTimeLabel = tk.Label(self.executionPane, **self.getItemStyle());
-        self.remainingTimeLabel.grid(row=6, column=0, sticky=tk.W + tk.E);
+        self.simulateButton.grid(row=4, column=0, sticky= tk.W + tk.E)
 
         # run button
         runButton = tk.Button(self.executionPane, text=Lang.get("Run"),
                               command=self.backend.runProcessing, **self.getItemStyle())
-        runButton.grid(row=8, column=0, columnspan=3, rowspan=5, sticky=tk.W + tk.E + tk.N + tk.S);
+        runButton.grid(row=4, column=1, columnspan = 5, sticky= tk.W + tk.E);
+
+        self.remainingTimeLabel = tk.Label(self.executionPane, **self.getItemStyle());
+        self.remainingTimeLabel.grid(row=4, column=6, sticky= tk.W + tk.E);
+
 
         self.pad(self.executionPane)
         self.notebook.add(self.executionPane, text=Lang.get('Execution'))
+
 
 
         self.saveRestorePane = tk.Frame(self.notebook)
@@ -217,8 +220,6 @@ class BatchProcessorGUI:
         self.notebook.add(self.saveRestorePane, text=Lang.get('Save & Restore'))
 
 
-
-
         self.configurePadding()
 
 
@@ -234,15 +235,15 @@ class BatchProcessorGUI:
 
     def centerWindow(self):
         # define measurements and center with respect to those
-        w = 750
-        h = 400
+        self.w = 750
+        self.h = 400
 
         sw = self.parent.winfo_screenwidth()
         sh = self.parent.winfo_screenheight()
 
-        x = (sw - w) / 2
-        y = (sh - h) / 2
-        self.parent.geometry('%dx%d+%d+%d' % (w, h, x, y))
+        x = (sw - self.w) / 2
+        y = (sh - self.h) / 2
+        self.parent.geometry('%dx%d+%d+%d' % (self.w, self.h, x, y))
 
     def createFrameWithText(self, parent, textValue):
         frame = tk.Frame(parent)
@@ -346,7 +347,7 @@ class BatchProcessorGUI:
 
 
     def loadConfig(self):
-        filePath =  tk.filedialog.askopenfilename(filetypes = [('JSON files', '*.json')], initialdir = self.config.opt['defaultConfigDir']);
+        filePath =  tk.filedialog.askopenfilename(filetypes = [('JSON files', '*.json')], initialdir = self.conf('defaultConfigDir'));
         if(filePath):
             self.loadConfigFromFile(filePath);
         else:
@@ -358,7 +359,7 @@ class BatchProcessorGUI:
         self.setConf('defaultConfigDir', os.path.dirname(filePath))
         self.updateConfigGUI();
         tk.messagebox.showinfo(Lang.get("Configuration file loaded"), Lang.get("The following settings have been loaded: ") +
-                              self.config.toJSON());
+                              self.backend.config.toJSON());
 
 
     #prompts the user for a filename and saves the configuration there
@@ -372,3 +373,6 @@ class BatchProcessorGUI:
         else:
             self.err(Lang.get('You did not select a desetination file or the file could not be saved'))
 
+    @staticmethod
+    def err(errMsg):
+        tk.messagebox.showerror(Lang.get("Error"), errMsg)

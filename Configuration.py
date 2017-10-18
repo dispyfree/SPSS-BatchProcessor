@@ -1,3 +1,5 @@
+import json
+
 class Configuration:
     currentVersion = 0.8;
     opt = {'inputSearchPattern': '', 'inputRegexPattern': '', 'outputFilePattern': '', 'outputDir': '',

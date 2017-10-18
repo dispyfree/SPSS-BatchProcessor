@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ef58e443-690d-4dd2-8360-0575a8056b0e" name="Default" comment="">
+    <list default="true" id="ef58e443-690d-4dd2-8360-0575a8056b0e" name="Default" comment="- fixed execution for PSPP&#10;- fixed displayed error messages&#10;- overhauled execution interface">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/BatchProcessorGUI.py" afterPath="$PROJECT_DIR$/BatchProcessorGUI.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Configuration.py" afterPath="$PROJECT_DIR$/Configuration.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Lang.py" afterPath="$PROJECT_DIR$/Lang.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MainWindow.py" afterPath="$PROJECT_DIR$/MainWindow.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/batchProcessor.py" afterPath="$PROJECT_DIR$/batchProcessor.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -14,11 +18,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="batchProcessor.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="batchProcessor.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/batchProcessor.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="442">
-              <caret line="277" column="68" lean-forward="false" selection-start-line="277" selection-start-column="68" selection-end-line="277" selection-end-column="68" />
+            <state relative-caret-position="222">
+              <caret line="174" column="54" lean-forward="true" selection-start-line="174" selection-start-column="54" selection-end-line="174" selection-end-column="54" />
               <folding>
                 <element signature="e#565#585#0" expanded="true" />
               </folding>
@@ -26,11 +30,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BatchProcessorGUI.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="BatchProcessorGUI.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/BatchProcessorGUI.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="290">
-              <caret line="292" column="45" lean-forward="false" selection-start-line="292" selection-start-column="45" selection-end-line="292" selection-end-column="45" />
+            <state relative-caret-position="-324">
+              <caret line="340" column="19" lean-forward="false" selection-start-line="340" selection-start-column="8" selection-end-line="340" selection-end-column="19" />
               <folding>
                 <element signature="e#1#21#0" expanded="true" />
               </folding>
@@ -38,14 +42,32 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="Lang.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Lang.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="126">
+              <caret line="4" column="329" lean-forward="false" selection-start-line="4" selection-start-column="329" selection-end-line="4" selection-end-column="329" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Configuration.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Configuration.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-8">
+              <caret line="3" column="25" lean-forward="false" selection-start-line="3" selection-start-column="25" selection-end-line="3" selection-end-column="25" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="MainWindow.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/MainWindow.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2322">
-              <caret line="140" column="13" lean-forward="false" selection-start-line="140" selection-start-column="13" selection-end-line="140" selection-end-column="13" />
-              <folding>
-                <element signature="e#0#20#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="198">
+              <caret line="11" column="41" lean-forward="false" selection-start-line="11" selection-start-column="41" selection-end-line="11" selection-end-column="41" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -61,28 +83,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>outputDir</find>
-      <find>BatchProcessorGUI</find>
-      <find>loadConfig</find>
-      <find>initializeWorkerAndGUI</find>
-      <find>init_GUI</find>
-      <find>gui</find>
-      <find>TopLevel</find>
-      <find>redoLast</find>
-      <find>__init</find>
-      <find>defaults</find>
-      <find>__init(</find>
-      <find>readIser</find>
-      <find>err(</find>
-      <find>json</find>
-      <find>expanduser</find>
-      <find>Processing</find>
-      <find>adding</find>
-      <find>configurePadding</find>
-      <find>Toplevel</find>
-      <find>weight</find>
-      <find>inputFiles</find>
-      <find>select input</find>
       <find>Remove</find>
       <find>removeSelected</find>
       <find>selectFiles</find>
@@ -91,9 +91,33 @@
       <find>Remove selec</find>
       <find>self.config.</find>
       <find>selectionTo</find>
+      <find>load</find>
+      <find>loadConfig</find>
+      <find>self.config</find>
+      <find>self.config</find>
+      <find>self.err</find>
+      <find>err(</find>
+      <find>self.backend.err</find>
+      <find>err</find>
+      <find>__init(</find>
+      <find>__init</find>
+      <find>Label</find>
+      <find>centerWindow</find>
+      <find>centerwindow</find>
+      <find>Run</find>
+      <find>GUITo</find>
+      <find>GUIToConfig</find>
+      <find>simulateProcessingVar</find>
+      <find>unicode</find>
+      <find>unicodedata</find>
+      <find>runSps</find>
+      <find>iteritems</find>
+      <find>submit</find>
     </findStrings>
     <replaceStrings>
       <replace>tk.Label</replace>
+      <replace>self.backend.err</replace>
+      <replace>self.err</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -102,11 +126,11 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Lang.py" />
         <option value="$PROJECT_DIR$/Configuration.py" />
-        <option value="$PROJECT_DIR$/batchProcessor.py" />
-        <option value="$PROJECT_DIR$/MainWindow.py" />
         <option value="$PROJECT_DIR$/BatchProcessorGUI.py" />
+        <option value="$PROJECT_DIR$/Lang.py" />
+        <option value="$PROJECT_DIR$/MainWindow.py" />
+        <option value="$PROJECT_DIR$/batchProcessor.py" />
       </list>
     </option>
   </component>
@@ -115,6 +139,22 @@
     <option name="y" value="105" />
     <option name="width" value="1360" />
     <option name="height" value="720" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>Buildout</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -148,7 +188,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="preferences.editor" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -219,9 +259,17 @@
       <option name="presentableId" value="Default" />
       <updated>1507815400156</updated>
     </task>
+    <task id="LOCAL-00001" summary="- file list copyable to clipboard">
+      <created>1508355162883</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1508355162883</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
-  <component name="TodoView">
+  <component name="TodoView" selected-index="4">
     <todo-panel id="selected-file">
       <is-autoscroll-to-source value="true" />
     </todo-panel>
@@ -233,16 +281,16 @@
   <component name="ToolWindowManager">
     <frame x="0" y="-4" width="1366" height="772" extended-state="6" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2659091" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1710731" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2659091" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22395024" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32868218" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32970452" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.16124031" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25757575" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="WINDOWED" visible="true" show_stripe_button="true" weight="0.2360877" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="189" y="447" width="1099" height="300" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="WINDOWED" visible="false" show_stripe_button="true" weight="0.2360877" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="189" y="447" width="1099" height="300" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -256,9 +304,14 @@
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="- file list copyable to clipboard" />
+    <MESSAGE value="- fixed execution for PSPP&#10;- fixed displayed error messages&#10;- overhauled execution interface" />
+    <option name="LAST_COMMIT_MESSAGE" value="- fixed execution for PSPP&#10;- fixed displayed error messages&#10;- overhauled execution interface" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="8" />
+      <option name="time" value="9" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -277,9 +330,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2322">
           <caret line="140" column="13" lean-forward="false" selection-start-line="140" selection-start-column="13" selection-end-line="140" selection-end-column="13" />
-          <folding>
-            <element signature="e#0#20#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -317,9 +368,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2322">
           <caret line="140" column="13" lean-forward="false" selection-start-line="140" selection-start-column="13" selection-end-line="140" selection-end-column="13" />
-          <folding>
-            <element signature="e#0#20#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -367,9 +416,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1998">
           <caret line="119" column="60" lean-forward="false" selection-start-line="119" selection-start-column="60" selection-end-line="119" selection-end-column="60" />
-          <folding>
-            <element signature="e#0#20#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -442,24 +489,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Lang.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/lib/python3.5/configparser.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="150">
           <caret line="1136" column="47" lean-forward="true" selection-start-line="1136" selection-start-column="47" selection-end-line="1136" selection-end-column="47" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Configuration.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="304">
-          <caret line="84" column="15" lean-forward="false" selection-start-line="84" selection-start-column="15" selection-end-line="84" selection-end-column="26" />
         </state>
       </provider>
     </entry>
@@ -484,32 +517,46 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/MainWindow.py">
+    <entry file="file://$PROJECT_DIR$/Configuration.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2322">
-          <caret line="140" column="13" lean-forward="false" selection-start-line="140" selection-start-column="13" selection-end-line="140" selection-end-column="13" />
-          <folding>
-            <element signature="e#0#20#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/batchProcessor.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="442">
-          <caret line="277" column="68" lean-forward="false" selection-start-line="277" selection-start-column="68" selection-end-line="277" selection-end-column="68" />
-          <folding>
-            <element signature="e#565#585#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="-8">
+          <caret line="3" column="25" lean-forward="false" selection-start-line="3" selection-start-column="25" selection-end-line="3" selection-end-column="25" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/BatchProcessorGUI.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="290">
-          <caret line="292" column="45" lean-forward="false" selection-start-line="292" selection-start-column="45" selection-end-line="292" selection-end-column="45" />
+        <state relative-caret-position="-324">
+          <caret line="340" column="19" lean-forward="false" selection-start-line="340" selection-start-column="8" selection-end-line="340" selection-end-column="19" />
           <folding>
             <element signature="e#1#21#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Lang.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="4" column="329" lean-forward="false" selection-start-line="4" selection-start-column="329" selection-end-line="4" selection-end-column="329" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MainWindow.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="198">
+          <caret line="11" column="41" lean-forward="false" selection-start-line="11" selection-start-column="41" selection-end-line="11" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/batchProcessor.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="222">
+          <caret line="174" column="54" lean-forward="true" selection-start-line="174" selection-start-column="54" selection-end-line="174" selection-end-column="54" />
+          <folding>
+            <element signature="e#565#585#0" expanded="true" />
           </folding>
         </state>
       </provider>

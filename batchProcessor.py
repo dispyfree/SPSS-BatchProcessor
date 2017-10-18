@@ -17,6 +17,7 @@ import tkinter as tk
 import tkinter.filedialog
 import tkinter.messagebox
 import tkinter.ttk as ttk
+import subprocess
 
 import os
 from os.path import basename
@@ -41,7 +42,7 @@ class BatchProcessor:
     # run the processing itself, iterate over files and update progress indicator
     def runProcessing(self):
         print(Lang.get('Started processing...'))
-        self.GUIToConfig();
+        self.gui.GUIToConfig();
         start_time = time.time()
         totalFileNum = len(self.inputFiles);
         fileCounter = 0;
@@ -52,9 +53,9 @@ class BatchProcessor:
             return False;
 
         #for simulation, simulate only first file
-        if (self.simulateProcessingVar.get() == 1):
+        if (self.gui.simulateProcessingVar.get() == 1):
             self.inputFiles = self.inputFiles[:1]
-        self.config.opt['simulateProcessing'] = (self.simulateProcessingVar.get() == 1);
+        self.config.opt['simulateProcessing'] = (self.gui.simulateProcessingVar.get() == 1);
 
         #fill up queue of tasks/files
         for filePath in self.inputFiles:
@@ -156,7 +157,7 @@ class BatchProcessor:
 
         # incorporate the capture groups in the input file name into REGEX file
         # get groupnames themselves
-        for grpName, grpValue in inputFileNameMatch.groupdict().iteritems():
+        for grpName, grpValue in inputFileNameMatch.groupdict().items():
             config.opt['placeholders'][grpName] = grpValue;
 
         #execute file command by command
@@ -166,7 +167,7 @@ class BatchProcessor:
                 continue;
 
             #replace placeholders
-            for placeholderKey, substitute in config.opt['placeholders'].iteritems():
+            for placeholderKey, substitute in config.opt['placeholders'].items():
                 command = command.replace("<" + placeholderKey + ">", substitute);
 
             #submit command itself to SPSS
@@ -174,8 +175,12 @@ class BatchProcessor:
             if(not(config.opt['simulateProcessing'])):
                 print(Lang.get("Executing: "), command);
                 #spss.Submit(command + ".");
-            else:
                 allCommands += command + ".\n";
+
+            with open("cmd.txt", "w") as cmd_file:
+                cmd_file.write(allCommands)
+                cmd_file.close()
+                subprocess.check_output(['pspp', './cmd.txt'])
 
         usedTime = (time.time() - start_time);
 
@@ -228,7 +233,7 @@ class BatchProcessor:
 
             # perhaps the placeholder is not in use after all (defined but not populated)
             if(replacement != None):
-                outputFileName = outputFileName.replace(unicode('<' + placeholder + '>'), replacement)
+                outputFileName = outputFileName.replace('<' + placeholder + '>', replacement)
         return self.config.opt['outputDir'] + '/' + outputFileName
 
 

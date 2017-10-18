@@ -2,7 +2,7 @@
 class Lang:
 
     entries = {
-        'en': {},
+        'en': {'runDescription' : 'Applies the selected SPSS routine on every file individually, in the order provided in the input tab. Upon the first error, execution will pause and the operator may choose whether to proceed. Simulation will output the SPSS code applied to the very first file - in this case, no computation is performed. '},
         'ch' :{'Load Configuration' : '调入配置'}
     }
 
