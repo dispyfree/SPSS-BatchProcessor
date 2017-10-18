@@ -4,6 +4,7 @@ import tkinter.filedialog
 import tkinter.messagebox
 import tkinter.ttk as ttk
 import os
+import string
 
 from Lang import Lang
 from batchProcessor import BatchProcessor
@@ -153,11 +154,15 @@ class BatchProcessorGUI:
 
         self.removeFilesButton = tk.Button(self.fileSelectionPane, text=Lang.get('Remove selected files'),
                                            command = self.removeSelectedFiles, **self.getItemStyle())
-        self.removeFilesButton.grid(row=7, column=3, sticky=tk.E)
+        self.removeFilesButton.grid(row=7, column=2, sticky=tk.E)
 
         self.removeAllFilesButton = tk.Button(self.fileSelectionPane, text=Lang.get('Remove all files'),
                                            command=self.removeAllFiles, **self.getItemStyle())
-        self.removeAllFilesButton.grid(row=7, column=4, sticky=tk.E)
+        self.removeAllFilesButton.grid(row=7, column=3, sticky=tk.E)
+
+        self.selectiontoClipboardButton = tk.Button(self.fileSelectionPane, text=Lang.get('Copy selection'),
+                                              command=self.selectionToClipboard, **self.getItemStyle())
+        self.selectiontoClipboardButton.grid(row=7, column=4, sticky=tk.E)
 
         self.pad(self.fileSelectionPane)
         self.notebook.add(self.fileSelectionPane, text=Lang.get('File Selection'))
@@ -229,7 +234,7 @@ class BatchProcessorGUI:
 
     def centerWindow(self):
         # define measurements and center with respect to those
-        w = 700
+        w = 750
         h = 400
 
         sw = self.parent.winfo_screenwidth()
@@ -280,6 +285,12 @@ class BatchProcessorGUI:
     def removeAllFiles(self):
         self.backend.inputFiles = []
         self.populateSelectedFileList()
+
+
+    def selectionToClipboard(self):
+        self.parent.clipboard_clear()
+        fileList = os.linesep.join(self.backend.inputFiles)
+        self.parent.clipboard_append(fileList)
 
 
     def selectDir(self):
