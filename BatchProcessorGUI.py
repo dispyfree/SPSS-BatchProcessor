@@ -50,13 +50,22 @@ class BatchProcessorGUI:
         }
 
 
-    def __init__(self, parent, batchProcessorArgs):
+    def __init__(self, parent, mainWindow, batchProcessorArgs):
         self.parent = parent
         batchProcessorArgs['gui'] = self
         self.backend = BatchProcessor(**batchProcessorArgs);
+        self.mainWindow = mainWindow
 
         self.centerWindow()
         self.init_GUI(parent)
+
+        #keeps track of all configurations we loaded
+        self.loadedConfigurationFilePaths = self.mainWindow.state['actions']['recentActions']
+
+
+    def propagateToUserState(self):
+        self.mainWindow.saveUserState()
+
 
 
     def init_GUI(self, parent):
@@ -259,7 +268,8 @@ class BatchProcessorGUI:
         if tmpFiles:
             # set defaults
             self.setConf('defaultInputDir', os.path.dirname(tmpFiles[0]));
-            self.backend.inputFiles += list(tmpFiles)
+            inputFiles = self.conf('inputFiles')
+            inputFiles += list(tmpFiles)
             self.populateSelectedFileList()
 
 
@@ -267,7 +277,7 @@ class BatchProcessorGUI:
         #clear list
         self.selectedFilesList.delete(0, tk.END)
 
-        for file in self.backend.inputFiles:
+        for file in self.conf('inputFiles'):
             self.selectedFilesList.insert(self.selectedFilesList.size(), file)
 
 
@@ -279,18 +289,19 @@ class BatchProcessorGUI:
         selected.sort()
         selected = reversed(selected)
         for index in selected:
-            self.backend.inputFiles.pop(index)
+            self.conf('inputFiles').pop(index)
+
         self.populateSelectedFileList()
 
 
     def removeAllFiles(self):
-        self.backend.inputFiles = []
+        self.setConf('inputFiles', [])
         self.populateSelectedFileList()
 
 
     def selectionToClipboard(self):
         self.parent.clipboard_clear()
-        fileList = os.linesep.join(self.backend.inputFiles)
+        fileList = os.linesep.join(self.conf('inputFiles'))
         self.parent.clipboard_append(fileList)
 
 
@@ -300,7 +311,8 @@ class BatchProcessorGUI:
             # set defaults
             self.setConf('defaultInputDir', directory)
             paths = [os.path.join(directory, fn) for fn in next(os.walk(directory))[2]]
-            self.backend.inputFiles += paths
+            inputFiles = self.conf('inputFiles')
+            inputFiles += paths
             self.populateSelectedFileList()
 
     def selectOutDir(self):
@@ -336,6 +348,7 @@ class BatchProcessorGUI:
         self.spssFileLabel.config(text=self.spssFile.get());
         self.outputFilePattern.set(self.conf(u'outputFilePattern'));
         self.outputDir.set(self.conf(u'outputDir'));
+        self.populateSelectedFileList()
 
 
     def GUIToConfig(self):
@@ -358,6 +371,9 @@ class BatchProcessorGUI:
         # set defaults
         self.setConf('defaultConfigDir', os.path.dirname(filePath))
         self.updateConfigGUI();
+
+        self.loadedConfigurationFilePaths.append(filePath)
+        self.propagateToUserState()
         tk.messagebox.showinfo(Lang.get("Configuration file loaded"), Lang.get("The following settings have been loaded: ") +
                               self.backend.config.toJSON());
 

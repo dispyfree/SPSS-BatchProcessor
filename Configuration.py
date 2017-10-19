@@ -4,7 +4,8 @@ class Configuration:
     currentVersion = 0.8;
     opt = {'inputSearchPattern': '', 'inputRegexPattern': '', 'outputFilePattern': '', 'outputDir': '',
            'placeholders': '', 'spssFile': '', 'defaultConfigDir': '', 'defaultSPSSDir': '', 'defaultInputDir': '',
-           'defaultOutDir': '', 'programVersion': currentVersion, 'simulateProcessing': False};
+           'defaultOutDir': '', 'programVersion': currentVersion, 'simulateProcessing': False,
+           'inputFiles' : []};
     reservedPlaceholders = opt.keys();
 
     """
@@ -57,6 +58,7 @@ class Configuration:
     opt['placeholders'] = {'INFILE': '', 'OUTPUTFILE': '', 'DUMMY': 'DUMMY'};
 
     opt['spssFile'] = 'none selected';
+    opt['inputFiles'] = [];
 
     """
     Defaults change to whatever the user chose last; this speeds up work considerably as we do not have to navigate

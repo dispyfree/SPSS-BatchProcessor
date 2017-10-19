@@ -19,8 +19,7 @@ class MainWindow:
 
     userStateDefaults = {
         'actions' :{
-            'recentActions': [],
-            'lastAction' : None,
+            'recentActions': []
         },
         'settings' :{
             'language' : []
@@ -48,11 +47,19 @@ class MainWindow:
 
 
     def redoAction(self):
-        pass
+        self.showBatchProcessor()
+        lastActionFilePath = self.state['actions']['recentActions'][-1]
+        self.gui.loadConfigFromFile(lastActionFilePath)
+        #todo: execute right away
 
 
     def spawnNewConfiguration(self):
         self.showBatchProcessor()
+
+
+    def loadConfiguration(self):
+        self.showBatchProcessor()
+        self.gui.loadConfig()
 
 
     def readUserState(self):
@@ -111,7 +118,7 @@ class MainWindow:
 
 
         self.loadConfigurationButton = tk.Button(self.centerFrame, text=Lang.get("Load Configuration"),
-                                           command=self.redoAction, **self.getItemStyle())
+                                           command=self.loadConfiguration, **self.getItemStyle())
         self.loadConfigurationButton.grid(row=6, column=0, sticky=tk.W + tk.E)
 
         self.newConfigurationButton = tk.Button(self.centerFrame, text=Lang.get("New Configuration"),
@@ -132,11 +139,9 @@ class MainWindow:
 
     def adaptGUIToState(self):
         # disable if there is none
-        if self.state['actions']['lastAction'] == None:
-            self.redoLastActionButton.config(state='disabled')
-
         if(len(self.state['actions']['recentActions']) == 0):
             self.recentActionsButton.config(state = 'disabled')
+            self.redoLastActionButton.config(state='disabled')
 
     def centerWindow(self):
         # define measurements and center with respect to those
@@ -157,7 +162,8 @@ class MainWindow:
         # returns the parsed script/placeholders to the calling process
         # please note that Tkinter is NOT threadsafe.
         self.debuggingResultQueue = Queue()
-        self.p = Process(target=SPSSWorkerProcess, args=(self.taskQueue, self.debuggingResultQueue));
+        self.errorQueue = Queue()
+        self.p = Process(target=SPSSWorkerProcess, args=(self.taskQueue, self.debuggingResultQueue, self.errorQueue));
 
         # start worker process
         # could be starting a pool of workers as well
@@ -171,8 +177,8 @@ class MainWindow:
         batchProcessorArgs = {'parent': self.parent,
                               'workerProcess': self.p,
                               'taskQueue': self.taskQueue,
-                              'debuggingResultQueue': self.debuggingResultQueue}
-        self.gui = BatchProcessorGUI(tk.Toplevel(self.parent), batchProcessorArgs);
+                              'debuggingResultQueue': self.debuggingResultQueue,}
+        self.gui = BatchProcessorGUI(tk.Toplevel(self.parent), self, batchProcessorArgs);
 
 
     def showHelp(self):
@@ -186,14 +192,14 @@ class MainWindow:
         tk.messagebox.showerror(Lang.get("Error"), errMsg)
 
 
-def SPSSWorkerProcess(taskQueue, debuggingResultQueue):
+def SPSSWorkerProcess(taskQueue, debuggingResultQueue, errorQueue):
     while(True):
         #block until next job is fetched
         job = taskQueue.get(True);
         [inputFilePath, outputFilePath, configStr] = job;
         config = Configuration()
         config.loadFromString(configStr);
-        BatchProcessor.runSPSSProcessOnFile(inputFilePath, outputFilePath, config, debuggingResultQueue);
+        BatchProcessor.runSPSSProcessOnFile(inputFilePath, outputFilePath, config, debuggingResultQueue, errorQueue);
 
 
 
