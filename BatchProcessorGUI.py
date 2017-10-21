@@ -206,6 +206,9 @@ class BatchProcessorGUI:
         self.remainingTimeLabel = tk.Label(self.executionPane, **self.getItemStyle());
         self.remainingTimeLabel.grid(row=4, column=6, sticky= tk.W + tk.E);
 
+        saveLog = tk.Button(self.executionPane, text=Lang.get("Save Processing Log"),
+                            command=self.saveProcessingLog, **self.getItemStyle())
+        saveLog.grid(row=5, column=1, columnspan=5, sticky=tk.W + tk.E);
 
         self.pad(self.executionPane)
         self.notebook.add(self.executionPane, text=Lang.get('Execution'))
@@ -389,6 +392,49 @@ class BatchProcessorGUI:
         else:
             self.err(Lang.get('You did not select a desetination file or the file could not be saved'))
 
+
+
+    def saveProcessingLog(self):
+        self.backend.transferLogQueue()
+        fileName = tk.filedialog.asksaveasfilename(initialdir= self.conf('defaultOutDir'), title=Lang.get('Select Logfile'),  filetypes=[("Log files", "*.txt"), ("all files","*.*")])
+
+        if fileName is not None:
+            with open(fileName, "w") as logFile:
+                logFile.write(os.linesep.join(self.backend.executionLog))
+                logFile.close()
+                tk.messagebox.showinfo(Lang.get("Logfile saved"),
+                                       Lang.get("The Logfile has been saved at the specified destination"))
+
+
     @staticmethod
     def err(errMsg):
         tk.messagebox.showerror(Lang.get("Error"), errMsg)
+
+
+
+    @classmethod
+    def handleExecutionError(self, exception, taskQueue, debuggingResultQueue, errorQueue):
+        """
+        Inquire whether operators would like to continue or to skip all remaining files
+        :param taskQueue:
+        :param debuggingResultQueue:
+        :param errorQueue:
+        :return:
+        """
+        spssExecutionError = ''
+        # CalledProcessError features the program's output in 'output'
+        if hasattr(exception, 'output'):
+            spssExecutionError = str(exception.output)
+        errMsg =    Lang.get('The following error occured, please check the log for details' + \
+        '\n Would you like to continue with the next file (Yes) or cancel processing (No) for all remaining files?')
+        print(spssExecutionError + '\n' + str(exception))
+
+        wantsToContinue = tk.messagebox.askyesno(Lang.get("Error occured, execution halted"),
+                            errMsg)
+        if not(wantsToContinue):
+            # clear the queue
+            while not taskQueue.empty():
+                taskQueue.get_nowait()  # as docs say: Remove and return an item from the queue.
+            print(Lang.get('Execution of remaining files has been aborted as by user\'s choice.'))
+
+

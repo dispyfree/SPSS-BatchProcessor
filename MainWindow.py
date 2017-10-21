@@ -162,8 +162,9 @@ class MainWindow:
         # returns the parsed script/placeholders to the calling process
         # please note that Tkinter is NOT threadsafe.
         self.debuggingResultQueue = Queue()
+        self.logQueue = Queue()
         self.errorQueue = Queue()
-        self.p = Process(target=SPSSWorkerProcess, args=(self.taskQueue, self.debuggingResultQueue, self.errorQueue));
+        self.p = Process(target=SPSSWorkerProcess, args=(self.logQueue, self.taskQueue, self.debuggingResultQueue, self.errorQueue));
 
         # start worker process
         # could be starting a pool of workers as well
@@ -177,6 +178,7 @@ class MainWindow:
         batchProcessorArgs = {'parent': self.parent,
                               'workerProcess': self.p,
                               'taskQueue': self.taskQueue,
+                              'logQueue' : self.logQueue,
                               'debuggingResultQueue': self.debuggingResultQueue,}
         self.gui = BatchProcessorGUI(tk.Toplevel(self.parent), self, batchProcessorArgs);
 
@@ -192,15 +194,17 @@ class MainWindow:
         tk.messagebox.showerror(Lang.get("Error"), errMsg)
 
 
-def SPSSWorkerProcess(taskQueue, debuggingResultQueue, errorQueue):
+def SPSSWorkerProcess(logQueue, taskQueue, debuggingResultQueue, errorQueue):
     while(True):
         #block until next job is fetched
         job = taskQueue.get(True);
         [inputFilePath, outputFilePath, configStr] = job;
         config = Configuration()
         config.loadFromString(configStr);
-        BatchProcessor.runSPSSProcessOnFile(inputFilePath, outputFilePath, config, debuggingResultQueue, errorQueue);
-
+        try:
+            BatchProcessor.runSPSSProcessOnFile(inputFilePath, outputFilePath, config, logQueue, debuggingResultQueue, errorQueue);
+        except Exception as e:
+            BatchProcessorGUI.handleExecutionError(e, taskQueue, debuggingResultQueue, errorQueue)
 
 
 def main():

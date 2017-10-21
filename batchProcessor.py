@@ -27,6 +27,7 @@ import json
 #import spss
 import io
 import time
+import datetime
 
 import argparse
 
@@ -67,8 +68,12 @@ class BatchProcessor:
             debuggingInfo = self.debuggingResultQueue.get(True, 0.1); # raises Empty exception if no result is present
             self.showDebuggingInformation(debuggingInfo)
 
-        tk.messagebox.showinfo(Lang.get('Processing completed'), Lang.get('Processing for %d files completed in %f seconds') % (
-            len(self.config.opt['inputFiles']), totalUsedTime));
+
+        self.transferLogQueue()
+        completedMsg = Lang.get('Processing for {} files completed in {:.2f} seconds').format(
+            len(self.config.opt['inputFiles']), totalUsedTime)
+        self.executionLog.append(completedMsg)
+        tk.messagebox.showinfo(Lang.get('Processing completed'), completedMsg);
 
 
     def trackProgress(self):
@@ -92,6 +97,11 @@ class BatchProcessor:
             time.sleep(0.5);
 
 
+    def transferLogQueue(self):
+        while not self.logQueue.empty():
+            entry = self.logQueue.get_nowait()
+            self.executionLog.append(entry)
+
 
     def runPreprocessingChecks(self):
         if len(self.config.opt['inputFiles']) == 0:
@@ -104,6 +114,13 @@ class BatchProcessor:
 
 
     def populateTaskQueue(self):
+        #populate execution log as well
+        self.executionLog = []
+        self.executionLog.append(Lang.get('Execution log on {}').format(datetime.datetime.now()))
+        self.executionLog.append(Lang.get('Configuration dump: ') + '\n' + self.config.toJSON())
+        self.executionLog.append('\n'+ Lang.get('Execution log:'))
+
+
         # fill up queue of tasks/files
         for filePath in self.config.opt['inputFiles']:
             self.defineDefaultPlaceholders(filePath);
@@ -113,6 +130,7 @@ class BatchProcessor:
             # parsing it to JSON and converting back works just fine.
             configStr = self.config.toJSON();
             self.queue.put([filePath, outputFilePath, configStr]);
+
 
 
 
@@ -182,18 +200,21 @@ class BatchProcessor:
             command = command.replace("<" + placeholderKey + ">", substitute);
         return command
 
+
     # process single given file with SPSS template and save to output File
     # returns the time it used up (in seconds)
     @staticmethod
-    def runSPSSProcessOnFile(inputFilePath, outputFilePath, config, debuggingResultQueue, errorQueue):
+    def runSPSSProcessOnFile(inputFilePath, outputFilePath, config, logQueue, debuggingResultQueue, errorQueue):
         #create dedicated TK instance; tk _always_ requires a window, however we just want message Boxes
         # create and hide main window
         root = tk.Tk()
         root.withdraw()
 
         start_time = time.time()
-        
-        print(Lang.get("Processing "), inputFilePath, "...");
+
+        logMsg = Lang.get("Processing ") +  inputFilePath + "..."
+        print(logMsg);
+        logQueue.put(logMsg)
 
         # read in commands
         spssCommands = BatchProcessor.loadRawCommandsFromFile(config)
@@ -221,11 +242,12 @@ class BatchProcessor:
         except subprocess.CalledProcessError as e:
             #halt processing
             errorQueue.put(e)
+            logQueue.put(Lang.get('Error occurred; execution incomplete'))
             raise
 
 
         usedTime = (time.time() - start_time);
-
+        logQueue.put(Lang.get('Processing finished in {:.2f}s').format(usedTime))
         debuggingResultQueue.put({'placeholders' : config.ObjToJSON(config.opt['placeholders']), 'commands' :
             allCommands});
 
@@ -327,9 +349,9 @@ class BatchProcessor:
 
     #initialize with process and queue; please note that as TK handles _cannot_ be pickled, we need to create
     #structures related to multiprocessing _before_ initializing the GUI (i.e. this class)
-    def __init__(self, gui, parent, workerProcess, taskQueue, debuggingResultQueue):
+    def __init__(self, gui, parent, workerProcess, logQueue, taskQueue, debuggingResultQueue):
         self.p = workerProcess;
-        self.queue, self.debuggingResultQueue = taskQueue, debuggingResultQueue;
+        self.queue, self.logQueue, self.debuggingResultQueue = taskQueue, logQueue, debuggingResultQueue;
         self.config = Configuration();
 
         parent.title(Lang.get("BatchProcessing"))
