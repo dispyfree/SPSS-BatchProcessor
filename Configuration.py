@@ -1,4 +1,5 @@
 import json
+from Lang import Lang
 
 class Configuration:
     currentVersion = 0.8;
@@ -71,10 +72,35 @@ class Configuration:
 
     # by default do NOT simulate
     opt['simulateProcessing'] = False;
+
+    """
+    Data accumulation is a special function which merges the cases of all selected files into one target file
+    By default, this special function is disabled. Enabling it enforces execution of 
+    @see accumulationFileTemplate
+    """
     opt['accumulateData'] = False
+
+
+    """
+    Pattern used to accumulate files; overwrites any value specified by the user
+    For accumulation, there is no need to extract information from the file name; therefore a standard pattern
+    is indeed sufficient.
+    """
     opt['accumulationFilePattern'] = '(?P<fileName>[\w]*).sav'
 
+
+    """
+    The very last file from the input files is selected, copied into the destination directory and renamed 
+    as defined in the following. Please note that the syntax in
+    @accumulationFileTemplate
+    has to be adapted whenever this value is changed. 
+    """
     accumulationFileName ='accumulate.sav'
+
+
+    """
+    Template for merging/accumulating data files
+    """
     accumulationFileTemplate = './workflow/Schritt_2_Zusammenfügen_der_SavDateien.sps'
 
     def getCurrentVersion(self):
@@ -87,8 +113,7 @@ class Configuration:
         self.opt = json.load(f);
         # check config file version
         if (self.opt['programVersion'] > self.getCurrentVersion()):
-            BatchProcessor.err("The config file was created using a newer program version. Settings might be ignored "
-                               "and behavior may change. To avoid surprises, please updated the BatchProcessor.")
+            BatchProcessor.err(Lang.get("The config file was created using a newer program version. Settings might be ignored and behavior may change. To avoid surprises, please updated the BatchProcessor."))
 
     def toJSON(self):
         return json.dumps(self.opt, default=lambda o: o.__dict__,

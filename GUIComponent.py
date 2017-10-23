@@ -21,9 +21,12 @@ class GUIComponent:
         for child in self.parent.winfo_children():
             child.grid(padx=5, pady=5)
 
-    def pad(self, parent):
+    def pad(self, parent, padding=None):
+        if padding is None:
+            padding = 10
+
         for obj in parent.winfo_children():
-            obj.grid(padx = 10, pady = 10)
+            obj.grid(padx = padding, pady = padding)
 
 
     def centerWindow(self):

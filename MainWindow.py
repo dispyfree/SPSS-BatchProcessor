@@ -1,21 +1,32 @@
+#GUI imports
 import tkinter as tk
 import tkinter.filedialog
 import tkinter.messagebox
-import tkinter.ttk as ttk
+
+# system imports
 import json
-
-import configparser, os
-from Configuration import Configuration
-
 from multiprocessing import Process, Queue
+import os
+
+
+#project imports
+from Configuration import Configuration
 from BatchProcessorGUI import BatchProcessorGUI
 from batchProcessor import BatchProcessor
 from LastActionsSelectionGUI import LastActionsSelectionGUI
-
 from Lang import Lang
+from GUIComponent import GUIComponent
 
-class MainWindow:
 
+class MainWindow (GUIComponent):
+    """
+    Window initially shown to user; allows to select among a number of general actions
+    """
+
+    """
+    user-specific configuration file (also referred to as: user state)
+    usually located in home directory (~ /*)
+    """
     userStateFileName = '~/.batchProcessor.txt'
 
     userStateDefaults = {
@@ -26,13 +37,7 @@ class MainWindow:
             'language' : []
         }
     }
-    userStateSections = ['actions', 'settings']
 
-    @staticmethod
-    def getItemStyle():
-        return {
-            'bg': 'white'
-        }
 
     def __init__(self):
         self.readUserState()
@@ -47,23 +52,37 @@ class MainWindow:
         self.parent.mainloop()
 
 
+
     def redoAction(self):
+        """
+        Loads the last action
+        """
         self.showBatchProcessor()
         lastActionFilePath = self.state['actions']['recentActions'][0]
         self.gui.loadConfigFromFile(lastActionFilePath)
-        #todo: execute right away
 
 
     def spawnNewConfiguration(self):
         self.showBatchProcessor()
 
 
+
     def loadConfiguration(self):
+        """
+        Shows batchProcessor interface and asks for a configuration file to load right away
+        """
         self.showBatchProcessor()
         self.gui.loadConfig()
 
 
+
     def readUserState(self):
+        """
+        Reads existing user state from location specified in
+        @see userStateFileName
+        otherwise, instantiates a new state with defaults as specified in this class
+        :return:
+        """
         expandedFileName =  os.path.expanduser(self.userStateFileName)
 
         if not(os.path.isfile(expandedFileName)):
@@ -76,8 +95,8 @@ class MainWindow:
             except:
                 self.err('Unable to load user state file')
 
-    def saveUserState(self):
 
+    def saveUserState(self):
         with open(os.path.expanduser(self.userStateFileName), 'w+') as f:
             if f is None:
                 self.err("Unable to save user state file")
@@ -85,11 +104,6 @@ class MainWindow:
             f.close()
 
 
-
-    def configurePadding(self):
-        # do some padding
-        for child in self.centerFrame.winfo_children():
-            child.grid_configure(padx=5, pady=5)
 
     def initGUI(self):
         self.mainWindow.configure(background='white')
@@ -131,7 +145,7 @@ class MainWindow:
         self.helpButton.grid(row=8, column=0, sticky=tk.W + tk.E)
 
 
-        self.configurePadding()
+        self.pad(self.centerFrame, 5)
         spssToolboxLabel.grid(pady = (0, 30))
         self.centerFrame.pack()
         self.adaptGUIToState()
@@ -142,13 +156,12 @@ class MainWindow:
         LastActionsSelectionGUI(tk.Toplevel(self.parent), self)
 
 
-
-
     def adaptGUIToState(self):
         # disable if there is none
         if(len(self.state['actions']['recentActions']) == 0):
             self.recentActionsButton.config(state = 'disabled')
             self.redoLastActionButton.config(state='disabled')
+
 
     def centerWindow(self):
         # define measurements and center with respect to those
@@ -165,6 +178,10 @@ class MainWindow:
 
 
     def initializeWorkerAndGUI(self):
+        """
+        Not all Python types are pickable (including tkinter's); therefore, to avoid those conditions, all critical
+        objects related to processes are instantiated before tkinter.
+        """
         self.taskQueue = Queue()
         # returns the parsed script/placeholders to the calling process
         # please note that Tkinter is NOT threadsafe.
@@ -176,12 +193,11 @@ class MainWindow:
         # start worker process
         # could be starting a pool of workers as well
         self.p.start()
-
         self.parent = root = tk.Tk();
 
 
-    def showBatchProcessor(self):
 
+    def showBatchProcessor(self):
         batchProcessorArgs = {'parent': self.parent,
                               'workerProcess': self.p,
                               'taskQueue': self.taskQueue,
@@ -197,9 +213,6 @@ class MainWindow:
             "Find detailed information on github.com"
         )
 
-    @staticmethod
-    def err(errMsg):
-        tk.messagebox.showerror(Lang.get("Error"), errMsg)
 
 
 def SPSSWorkerProcess(logQueue, taskQueue, debuggingResultQueue, errorQueue):

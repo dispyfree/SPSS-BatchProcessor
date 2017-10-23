@@ -113,7 +113,7 @@ class BatchProcessorGUI (GUIComponent):
         self.inputRegexPattern = tk.StringVar()
         self.inputRegexPattern.set('(?P<fileName>[\w]*).txt');
         self.inputRegexEntry = tk.Entry(self.configurationPane, textvariable=self.inputRegexPattern, **self.getItemStyle())
-        self.inputRegexEntry.grid(row=1, column=1, sticky=tk.W + tk.E, columnspan=2)
+        self.inputRegexEntry.grid(row=1, column=1, sticky=tk.W + tk.E, columnspan=1)
 
         # processing spss file
         self.processSPSSFileLabel = tk.Label(self.configurationPane, text=Lang.get("Processing SPSS file"), **self.getItemStyle()).grid(row=2, column=0,

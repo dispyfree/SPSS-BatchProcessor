@@ -1,19 +1,19 @@
 import tkinter as tk
-import tkinter.filedialog
-import tkinter.messagebox
 import tkinter.ttk as ttk
 
 from Lang import Lang
+from GUIComponent import GUIComponent
 
+class LastActionsSelectionGUI (GUIComponent):
+    """
+    Spawns dedicated window to let operator choose among last actions
+    instantiates BatchProcessorGUI if action is selected
+    """
+    # maximum number of last actions to display
+    lastActionsNum = 10
 
-class LastActionsSelectionGUI:
-
-    @staticmethod
-    def getItemStyle():
-        return {
-            'bg': 'white'
-        }
-
+    # width of actions list in pixels
+    actionsListWidth = 400
 
     def init_GUI(self, parent):
         parent.title(Lang.get('Processing'))
@@ -30,8 +30,7 @@ class LastActionsSelectionGUI:
         self.selectedActionList = tk.Listbox(self.parent)
         self.selectedActionList.grid(row=1, rowspan=6,
                                     column=0, columnspan=6, sticky=tk.W + tk.E)
-        actionsListWidth = 400
-        self.selectedActionList.config(width = actionsListWidth)
+        self.selectedActionList.config(width = self.actionsListWidth)
         self.populateActionsList()
 
         self.openSelectedActionsButton = tk.Button(self.parent, text= Lang.get('Open selected Configuration'),
@@ -56,27 +55,12 @@ class LastActionsSelectionGUI:
         self.selectedActionList.delete(0, tk.END)
 
         # create buttons for 5 last actions from backend
-        lastActionsNum = 10
         lastActions = self.mainWindow.state['actions']['recentActions']
-        noOfActions = min(len(lastActions), lastActionsNum)
+        noOfActions = min(len(lastActions), self.lastActionsNum)
         lastActions = lastActions[0:noOfActions]
 
         for actionPath in lastActions:
             self.selectedActionList.insert(self.selectedActionList.size(), actionPath)
-
-
-    def centerWindow(self):
-        # define measurements and center with respect to those
-        self.w = 700
-        self.h = 200
-
-        sw = self.parent.winfo_screenwidth()
-        sh = self.parent.winfo_screenheight()
-
-        x = (sw - self.w) / 2
-        y = (sh - self.h) / 2
-        self.parent.geometry('%dx%d+%d+%d' % (self.w, self.h, x, y))
-
 
 
     def __init__(self, parent, mainWindow):
