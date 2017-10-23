@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-The SPSS Batch Processor is designed to run spss syntaxes in batch mode. It can accept an arbitrary number of files
-and applies a given SPSS routine to each file individually. Information specific to each subject (it is recommended
-to have one subject per file) can be extracted from the filename.
-All commands are executed line-wise using the SPSS Python API.
+The SPSS Batch Processor is designed to run SPSS/PSPP syntaxes in batch mode. It can accept an arbitrary number of files and applies a given SPSS/PSPP routine to each file individually. Information specific to each subject (it is recommended to have one subject per file) can be extracted from the filename.
+All commands are executed using the command line (PSPP) or line-wise using the SPSS Python API.
 
 Author: Valentin Dreismann
 Last modified: 2017
@@ -13,35 +11,41 @@ Last modified: 2017
 Psychologische Diagnostik. Differentielle Psychologie und Persönlichkeitspsychologie
 University of Kiel
 """
+
+#GUI imports
 import tkinter as tk
-import tkinter.filedialog
 import tkinter.messagebox
 import tkinter.ttk as ttk
-import subprocess
 
+#system imports
 import os
 from os.path import basename
 import re
-from multiprocessing import Process, Queue
 import queue
-
-import json
-#import spss
+import subprocess
 import io
 import time
 import datetime
-
 import argparse
 import shutil
 
+#project imports
 from Lang import Lang
 from Configuration import Configuration
 from PSPPExecutor import PSPPExecutor
 
 
 class BatchProcessor:
+    """
+    Processing backend; breaks work down into tasks and arranges for their execution. Additionally, monitors progress
+    """
 
+    """
+    Wraps execution by a specific statistics engine. 
+    Available are PSPPExecutor and SPSSExecutor
+    """
     executor = PSPPExecutor()
+
 
     # SPSS Processing
     # ----------------------------------------------------------------------------------------------------------------
@@ -51,30 +55,26 @@ class BatchProcessor:
         print(Lang.get('Started processing...'))
         self.gui.GUIToConfig();
 
-        start_time = time.time()
-        totalFileNum = len(self.config.opt['inputFiles']);
-        fileCounter = 0;
         totalUsedTime = 0.0;
 
         if not(self.runPreprocessingChecks()):
             return False
 
-        #for simulation, simulate only first file
-        if (self.gui.simulateProcessingVar.get() == 1):
-            self.config.opt['simulateProcessing'] = True
         self.config.opt['simulateProcessing'] = (self.gui.simulateProcessingVar.get() == 1);
 
         self.populateTaskQueue()
         self.trackProgress()
 
+        # show debugging information upon completion
         if (self.config.opt['simulateProcessing']):
+            # need try/catch here; depending on error, queue may be empty
             try:
                 debuggingInfo = self.debuggingResultQueue.get_nowait();
                 self.showDebuggingInformation(debuggingInfo)
             except queue.Empty as e:
                 pass
 
-
+        # transfer information from queue to log (i.e. workers => backend)
         self.transferLogQueue()
         completedMsg = Lang.get('Processing for {} files completed in {:.2f} seconds').format(
             len(self.config.opt['inputFiles']), totalUsedTime)
@@ -82,10 +82,15 @@ class BatchProcessor:
         tk.messagebox.showinfo(Lang.get('Processing completed'), completedMsg);
 
 
+
     def trackProgress(self):
+        """
+        Indicates computation progress using progress bar in main window
+        """
         alreadyProcessedFiles = 0;
         # keep updating the progress bar
-        # debugging result queue is expected to fill as well
+        # at least one of debugging result queue OR errorQueue is expected to fill as well
+        # queue may be empty immediately, as worker may "snatch" task before this function is even called.
         while (not (self.queue.empty()) or (self.debuggingResultQueue.empty() and self.errorQueue.empty())):
             processedAsOfNow = (self.totalFileNum - self.queue.qsize());
             processedJustNow = processedAsOfNow - alreadyProcessedFiles;
@@ -96,15 +101,20 @@ class BatchProcessor:
             totalUsedTime = (time.time() - self.start_time);
 
             # update estimated time
-            self.gui.remainingTimeLabel.config(text=Lang.get('Remaining time: %.2f seconds ') % self.estimateRemainingTime(
-                len(self.config.opt['inputFiles']), alreadyProcessedFiles, totalUsedTime));
+            estimate = self.estimateRemainingTime(self.totalFileNum, alreadyProcessedFiles, totalUsedTime)
+            self.gui.remainingTimeLabel.config(text=Lang.get('Remaining time: %.2f seconds ') % estimate);
 
             # propagate changes to GUI
             self.gui.parent.update();
             time.sleep(0.5);
 
 
+
     def transferLogQueue(self):
+        """
+        Move events from logQueue (i.e. workers) to the backend log
+        :return:
+        """
         while not self.logQueue.empty():
             entry = self.logQueue.get_nowait()
             self.executionLog.append(entry)
@@ -115,7 +125,7 @@ class BatchProcessor:
             self.err(Lang.get("You did not select any files"));
             return False
 
-        #todo:check whether REGEX applies
+        #todo:check whether REGEX matches all files
         return True
 
 
@@ -124,8 +134,8 @@ class BatchProcessor:
         #populate execution log as well
         self.executionLog = []
         self.executionLog.append(Lang.get('Execution log on {}').format(datetime.datetime.now()))
-        self.executionLog.append(Lang.get('Configuration dump: ') + '\n' + self.config.toJSON())
-        self.executionLog.append('\n'+ Lang.get('Execution log:'))
+        self.executionLog.append(Lang.get('Configuration dump: ') + os.linesep + self.config.toJSON())
+        self.executionLog.append( os.linesep + Lang.get('Execution log:'))
 
 
         #for debugging, only very first file will be processed
@@ -134,7 +144,7 @@ class BatchProcessor:
             #if we do not accumulate, choose only one
             if not(self.config.opt['accumulateData']):
                 self.config.opt['inputFiles'] = self.config.opt['inputFiles'][0:1]
-            #otherwise, we need two
+            #otherwise, we need at least two
             else:
                 self.config.opt['inputFiles'] = self.config.opt['inputFiles'][0:2]
 
@@ -143,16 +153,10 @@ class BatchProcessor:
         # remove files permanently.
         inputFilesToUse = self.config.opt['inputFiles'][:]
         self.totalFileNum = 0
+
         #if we accumulate data, move and rename the very last entry, but do not touch the others
         if(self.config.opt['accumulateData']):
-            lastFilePath = inputFilesToUse.pop()
-            self.totalFileNum += 1
-            newFilePath = self.config.opt['outputDir'] + '/' + Configuration.accumulationFileName
-            shutil.copyfile(lastFilePath, newFilePath)
-
-            #furthermore, set spss execution file to template
-            self.config.opt['spssFile']             = Configuration.accumulationFileTemplate
-            self.config.opt['inputRegexPattern']    = self.config.opt['accumulationFilePattern']
+           self.moveRenameAccumulationFile(inputFilesToUse)
 
 
         self.start_time = time.time()
@@ -169,8 +173,31 @@ class BatchProcessor:
 
 
 
+    def moveRenameAccumulationFile(self, inputFilesToUse):
+        """
+        Move very last file to destination, rename it and accumulate all other data on top
+        :param inputFilesToUse: list of input paths
+        """
+        lastFilePath = inputFilesToUse.pop()
+        self.totalFileNum += 1
+        newFilePath = os.path.join(self.config.opt['outputDir'], Configuration.accumulationFileName)
+        shutil.copyfile(lastFilePath, newFilePath)
+
+        # furthermore, set spss execution file to template
+        self.config.opt['spssFile'] = Configuration.accumulationFileTemplate
+        self.config.opt['inputRegexPattern'] = self.config.opt['accumulationFilePattern']
+
+        #propagate changes back to GUI
+        self.gui.updateConfigGUI()
+
+
 
     def showDebuggingInformation(self, debuggingInfo):
+        """
+        Spawns new window, allows to inspect parameters and generated code for a single file
+        :param debuggingInfo: dictionary with keys 'placeholders' and 'commands'
+        :return:
+        """
         t = tk.Toplevel(self.gui.parent)
         t.wm_title(Lang.get("Debugging information"))
 
@@ -185,14 +212,21 @@ class BatchProcessor:
         self.gui.parent.update();
 
 
+
     def estimateRemainingTime(self, totalFiles, processedFiles, usedTime):
         if(processedFiles == 0):
             return 0.0;
         else:
             return (float(totalFiles - processedFiles) / float(processedFiles)) * usedTime;
 
+
     @classmethod
     def loadRawCommandsFromFile(cls, config):
+        """
+        Returns list of commands from file (which must be UTF-8 encoded)
+        :param config: key 'spssFile' will be used
+        :return: list of commands
+        """
         try:
             with io.open(config.opt['spssFile'], "r", encoding='utf8') as f:
                 if(f == None):
@@ -200,7 +234,7 @@ class BatchProcessor:
                 else:
                     spssCommands = f.read()
             #by definition, commands end with "." and a newline
-            spssCommands = spssCommands.split(".\n");
+            spssCommands = spssCommands.split("." + os.linesep);
             return spssCommands
         except:
             cls.err(Lang.get("Unable to open SPSS file"))
@@ -216,10 +250,10 @@ class BatchProcessor:
         # set special placeholders
         config.opt['placeholders']['INFILE'] = inputFilePath;
         # input Path doesn't have a trailing slash
-        config.opt['placeholders']['INPUTDIR'] = inputPath + '/';
+        config.opt['placeholders']['INPUTDIR'] = inputPath + os.sep;
         config.opt['placeholders']['OUTPUTFILE'] = outputFilePath;
         # output Path doesn't have a trailing slash
-        config.opt['placeholders']['OUTPUTDIR'] = config.opt['outputDir'] + '/';
+        config.opt['placeholders']['OUTPUTDIR'] = config.opt['outputDir'] + os.sep;
         config.opt['placeholders']['fileName'] = basename(inputFilePath);
 
         # incorporate the capture groups in the input file name into REGEX file
@@ -237,10 +271,13 @@ class BatchProcessor:
         return command
 
 
-    # process single given file with SPSS template and save to output File
-    # returns the time it used up (in seconds)
+
     @staticmethod
     def runSPSSProcessOnFile(inputFilePath, outputFilePath, config, logQueue, debuggingResultQueue, errorQueue):
+        """
+        process single given file with SPSS template and save to output File
+        returns the time it used up (in seconds)
+        """
         #create dedicated TK instance; tk _always_ requires a window, however we just want message Boxes
         # create and hide main window
         root = tk.Tk()
@@ -265,12 +302,7 @@ class BatchProcessor:
 
             command = BatchProcessor.applyPlaceholders(command, config)
             allCommands.append(command)
-
-            #submit command itself to SPSS
-            # TODO: deal with errors, how? Currently, they show up in console. Probably best way to go anyway.
-            if(not(config.opt['simulateProcessing'])):
-                print(Lang.get("Executing: "), command);
-                #spss.Submit(command + ".");
+            print(Lang.get("Executing: "), command);
 
         try:
             pointPlusNewline = '.' + os.linesep
@@ -294,6 +326,9 @@ class BatchProcessor:
 
     @staticmethod
     def err(errMsg):
+        """
+        Shows given error message in Messagebox
+        """
         tk.messagebox.showerror(Lang.get("Error"), errMsg)
 
 
@@ -302,14 +337,17 @@ class BatchProcessor:
         # set special placeholders
         self.config.opt['placeholders']['INFILE'] = inputFilePath;
         # input Path doesn't have a trailing slash
-        self.config.opt['placeholders']['INPUTDIR'] = inputPath + '/';
+        self.config.opt['placeholders']['INPUTDIR'] = inputPath + os.sep;
         # output Path doesn't have a trailing slash
-        self.config.opt['placeholders']['OUTPUTDIR'] = self.config.opt['outputDir'] + '/';
+        self.config.opt['placeholders']['OUTPUTDIR'] = self.config.opt['outputDir'] + os.sep;
         self.config.opt['placeholders']['fileName'] = basename(inputFilePath);
 
 
-    # constructs output file path from given path and inputRegexPattern; also populates inputFileNameMatch
+
     def getOutputFilePath(self, oldFilePath):
+        """
+        constructs output file path from given path and inputRegexPattern; also populates inputFileNameMatch
+        """
         path = os.path.dirname(oldFilePath)
         file = os.path.basename(oldFilePath);
         # extract information from input file path using regex
@@ -339,63 +377,28 @@ class BatchProcessor:
             # perhaps the placeholder is not in use after all (defined but not populated)
             if(replacement != None):
                 outputFileName = outputFileName.replace('<' + placeholder + '>', replacement)
-        return self.config.opt['outputDir'] + '/' + outputFileName
+        return self.config.opt['outputDir'] + os.sep + outputFileName
 
 
-    def parseCommandLine(self):
-        self.parser = argparse.ArgumentParser(description= Lang.get('Applies an SPSS file on a given set of files'))
-        self.parser.add_argument('--config', dest='passedConfigurationFile', 
-                            help=Lang.get('configuration file to load'))
-        self.parser.add_argument('--executeAutomatically', action='store_true',
-                                 help=Lang.get('begin processing upon startup'))
-        self.parser.add_argument('--placeholders', help=Lang.get('specify placeholders as [ph1][valueOf ph1] [ph2] [valueOf '
-                                                        'ph2]...'));
 
-        self.commandLineArgs = self.parser.parse_args()
-
-    def loadPredefinedConfiguration(self):
-        if(self.commandLineArgs.passedConfigurationFile is not None):
-            self.loadConfigFromFile(self.commandLineArgs.passedConfigurationFile);
-            self.parseCommandLinePlaceholders();
-            if(self.commandLineArgs.executeAutomatically):
-                self.selectFiles();
-        else:
-            self.parseCommandLinePlaceholders();
-            if(self.commandLineArgs.executeAutomatically):
-                self.err(Lang.get("You cannot specify automatic execution while not providing a configuration. Please provide "
-                         "--config"));
-
-
-    def parseCommandLinePlaceholders(self):
-        # group parameters, pH = placeHolder
-        pHList = self.commandLineArgs.placeholders;
-        N = 2;
-        if(pHList is not None):
-            lst = [pHList[n:n + N] for n in range(0, len(pHList), N)]
-        else:
-            lst = [];
-
-        #now set placeholders
-        for pair in lst:
-            key, value = pair[0], pair[1]
-            if(placeholderKey in self.config.reservedPlaceholders):
-                self.err(Lang.get("You cannot set reserved placeholders: ") + placeholderKey);
-            else:
-                placeholderKey = '<' + key + '>';
-                self.config.opt['placeholders'][placeholderKey] = value;
-
-    #initialize with process and queue; please note that as TK handles _cannot_ be pickled, we need to create
-    #structures related to multiprocessing _before_ initializing the GUI (i.e. this class)
     def __init__(self, gui, parent, workerProcess, logQueue, taskQueue, debuggingResultQueue, errorQueue):
+        """
+        initialize with process and queue; please note that as TK handles _cannot_ be pickled, we need to create
+        structures related to multiprocessing _before_ initializing the GUI (i.e. this class)
+        :param gui: BatchProcessorGUI instance
+        :param parent: TKinter frame instance (to draw into)
+        :param workerProcess:
+        :param logQueue:
+        :param taskQueue:
+        :param debuggingResultQueue:
+        :param errorQueue:
+        """
         self.p = workerProcess;
         self.queue, self.logQueue, self.debuggingResultQueue, self.errorQueue = taskQueue, logQueue, debuggingResultQueue, errorQueue;
         self.config = Configuration();
 
         parent.title(Lang.get("BatchProcessing"))
         self.gui = gui
-
-        self.parseCommandLine()
-        self.loadPredefinedConfiguration()
 
         self.executionLog = []
 

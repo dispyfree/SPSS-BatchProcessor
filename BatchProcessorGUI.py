@@ -1,16 +1,24 @@
 
+# gui imports
 import tkinter as tk
 import tkinter.filedialog
 import tkinter.messagebox
 import tkinter.ttk as ttk
-import os
 import tkinter.scrolledtext
-import string
 
+#system imports
+import os
+
+#project imports
 from Lang import Lang
 from batchProcessor import BatchProcessor
+from GUIComponent import GUIComponent
 
-class BatchProcessorGUI:
+class BatchProcessorGUI (GUIComponent):
+    """
+    GUI component to the BatchProcessor backend
+    """
+
     # GUI
     # -------------------------------------------------------------------------------------------------------------
 
@@ -44,14 +52,14 @@ class BatchProcessorGUI:
         options['initialdir'] = self.conf('defaultOutDir')
         return options;
 
-    @staticmethod
-    def getItemStyle():
-        return {
-            'bg': 'white'
-        }
-
 
     def __init__(self, parent, mainWindow, batchProcessorArgs):
+        """
+
+        :param parent: tkinter frame object
+        :param mainWindow: MainWindow instance
+        :param batchProcessorArgs: arguments to pass on to the backend
+        """
         self.parent = parent
         batchProcessorArgs['gui'] = self
         self.backend = BatchProcessor(**batchProcessorArgs);
@@ -82,6 +90,10 @@ class BatchProcessorGUI:
 
 
         self.notebook = ttk.Notebook(parent, padding=10)
+
+
+        # Configuration
+        #------------------------------------------------------------------------------------------------------
 
         self.configurationPane =   tk.Frame(self.notebook)
         self.configurationPane.configure(background = 'white')
@@ -149,8 +161,8 @@ class BatchProcessorGUI:
 
 
 
-
-
+        # File Selection
+        # ------------------------------------------------------------------------------------------------------
         self.fileSelectionPane = tk.Frame(self.notebook)
         self.fileSelectionPane.configure(background='white')
 
@@ -188,7 +200,8 @@ class BatchProcessorGUI:
 
 
 
-
+        # Execution
+        # ------------------------------------------------------------------------------------------------------
         self.executionPane = tk.Frame(self.notebook)
         self.executionPane.configure(background='white')
 
@@ -226,7 +239,8 @@ class BatchProcessorGUI:
         self.notebook.add(self.executionPane, text=Lang.get('Execution'))
 
 
-
+        # Save & Restore
+        # ------------------------------------------------------------------------------------------------------
         self.saveRestorePane = tk.Frame(self.notebook)
         self.saveRestorePane.configure(background='white')
 
@@ -247,34 +261,6 @@ class BatchProcessorGUI:
         self.configurePadding()
 
 
-    def configurePadding(self):
-        # do some padding
-        for child in self.parent.winfo_children():
-            child.grid(padx=5, pady=5)
-
-    def pad(self, parent):
-        for obj in parent.winfo_children():
-            obj.grid(padx = 10, pady = 10)
-
-
-    def centerWindow(self):
-        # define measurements and center with respect to those
-        self.w = 750
-        self.h = 400
-
-        sw = self.parent.winfo_screenwidth()
-        sh = self.parent.winfo_screenheight()
-
-        x = (sw - self.w) / 2
-        y = (sh - self.h) / 2
-        self.parent.geometry('%dx%d+%d+%d' % (self.w, self.h, x, y))
-
-    def createFrameWithText(self, parent, textValue):
-        frame = tk.Frame(parent)
-        t = tkinter.scrolledtext.ScrolledText(frame, undo=True)
-        t.pack()
-        t.insert(tk.END, textValue)
-        return frame
 
     # Selection process
     # ---------------------------------------------------------------------------------------------------------------
@@ -322,6 +308,10 @@ class BatchProcessorGUI:
 
 
     def selectDir(self):
+        """
+        Asks operator for directory and adds all files contained within to the current selections
+        :return:
+        """
         directory = tk.filedialog.askdirectory();
         if directory:
             # set defaults
@@ -331,7 +321,11 @@ class BatchProcessorGUI:
             inputFiles += paths
             self.populateSelectedFileList()
 
+
     def selectOutDir(self):
+        """
+        Asks operator for output directory
+        """
         dirName = tk.filedialog.askdirectory(**self.getOutputDirOptions())
         if dirName:
             # set defaults
@@ -341,12 +335,16 @@ class BatchProcessorGUI:
 
 
     def selectSPSSFile(self):
+        """
+        Asks operator for SPSS file
+        """
         fileName = tk.filedialog.askopenfilename(**self.getSPSSFileOptions())
         if (fileName):
             # set defaults
             self.setConf('defaultSPSSDir', os.path.dirname(fileName))
             self.spssFile.set(fileName)
             self.spssFileLabel.config(text=self.spssFile.get());
+
 
     # Configuration management
     # ----------------------------------------------------------------------------------------------------------------
@@ -358,6 +356,11 @@ class BatchProcessorGUI:
 
 
     def updateByAccumulateButton(self):
+        """
+        Limits availability of other functionality depending on whether accumulation is chosen
+        (i.e. specification of input regex pattern is not well-defined if accumulation is enabled)
+        :return:
+        """
         # first, disable/enable other buttons
         othersState = 'normal'
         if(self.accumulateDataVar.get() == 1.0):
@@ -372,7 +375,9 @@ class BatchProcessorGUI:
 
 
     def updateConfigGUI(self):
-        # TODO: u: wtf??!!
+        """
+        Propagates config to GUI
+        """
         self.inputSearchPattern.set(self.conf(u'inputSearchPattern'));
         self.inputRegexPattern.set(self.conf(u'inputRegexPattern'));
         self.spssFile.set(self.conf(u'spssFile'));
@@ -385,6 +390,9 @@ class BatchProcessorGUI:
 
 
     def GUIToConfig(self):
+        """
+        Propagates GUI to config
+        """
         self.setConf('inputSearchPattern', self.inputSearchPattern.get())
         self.setConf('inputRegexPattern', self.inputRegexPattern.get())
         self.setConf('spssFile', self.spssFile.get())
@@ -396,11 +404,16 @@ class BatchProcessorGUI:
 
 
     def loadConfig(self):
+        """
+        Inquires about configuration file, loads specified file
+        :return:
+        """
         filePath =  tk.filedialog.askopenfilename(filetypes = [('JSON files', '*.json')], initialdir = self.conf('defaultConfigDir'));
         if(filePath):
             self.loadConfigFromFile(filePath);
         else:
             self.err(Lang.get('You did not select a config file or the file could not be opened'))
+
 
     def loadConfigFromFile(self, filePath):
         self.backend.config.loadFromFile(open(filePath, 'r'));
@@ -416,8 +429,10 @@ class BatchProcessorGUI:
         self.updateByAccumulateButton()
 
 
-    #prompts the user for a filename and saves the configuration there
     def saveConfig(self):
+        """
+        prompts the user for a filename and saves the configuration there
+        """
         self.GUIToConfig();
         f = tk.filedialog.asksaveasfile(mode='w', filetypes=[('JSON files', '*.json')], defaultextension = '.json');
         if(f):
@@ -430,6 +445,9 @@ class BatchProcessorGUI:
 
 
     def saveProcessingLog(self):
+        """
+        transfers events from log queue to main log instance, asks operator for file name and exports log
+        """
         self.backend.transferLogQueue()
         fileName = tk.filedialog.asksaveasfilename(initialdir= self.conf('defaultOutDir'), title=Lang.get('Select Logfile'),  filetypes=[("Log files", "*.txt"), ("all files","*.*")])
 
@@ -440,17 +458,10 @@ class BatchProcessorGUI:
                 tk.messagebox.showinfo(Lang.get("Logfile saved"),
                                        Lang.get("The Logfile has been saved at the specified destination"))
 
-
-    @staticmethod
-    def err(errMsg):
-        tk.messagebox.showerror(Lang.get("Error"), errMsg)
-
-
-
     @classmethod
     def handleExecutionError(self, exception, taskQueue, debuggingResultQueue, errorQueue):
         """
-        Inquire whether operators would like to continue or to skip all remaining files
+        Inquires whether operators would like to continue or to skip all remaining files
         :param taskQueue:
         :param debuggingResultQueue:
         :param errorQueue:

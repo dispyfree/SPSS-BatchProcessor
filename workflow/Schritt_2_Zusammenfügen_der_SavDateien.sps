@@ -4,7 +4,7 @@
 
 GET
   /FILE='<OUTPUTDIR>accumulate.sav'.
-ADD FILES a
+ADD FILES 
 	/FILE=*
 	/FILE='<INFILE>'.
 
