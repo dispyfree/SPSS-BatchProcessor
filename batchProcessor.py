@@ -23,6 +23,8 @@ import os
 from os.path import basename
 import re
 from multiprocessing import Process, Queue
+import queue
+
 import json
 #import spss
 import io
@@ -30,6 +32,7 @@ import time
 import datetime
 
 import argparse
+import shutil
 
 from Lang import Lang
 from Configuration import Configuration
@@ -58,15 +61,18 @@ class BatchProcessor:
 
         #for simulation, simulate only first file
         if (self.gui.simulateProcessingVar.get() == 1):
-            self.config.opt['inputFiles'] = self.config.opt['inputFiles'][:1]
+            self.config.opt['simulateProcessing'] = True
         self.config.opt['simulateProcessing'] = (self.gui.simulateProcessingVar.get() == 1);
 
         self.populateTaskQueue()
         self.trackProgress()
 
         if (self.config.opt['simulateProcessing']):
-            debuggingInfo = self.debuggingResultQueue.get(True, 0.1); # raises Empty exception if no result is present
-            self.showDebuggingInformation(debuggingInfo)
+            try:
+                debuggingInfo = self.debuggingResultQueue.get_nowait();
+                self.showDebuggingInformation(debuggingInfo)
+            except queue.Empty as e:
+                pass
 
 
         self.transferLogQueue()
@@ -79,21 +85,22 @@ class BatchProcessor:
     def trackProgress(self):
         alreadyProcessedFiles = 0;
         # keep updating the progress bar
-        while (not (self.queue.empty())):
-            processedAsOfNow = (totalFileNum - self.queue.qsize());
+        # debugging result queue is expected to fill as well
+        while (not (self.queue.empty()) or (self.debuggingResultQueue.empty() and self.errorQueue.empty())):
+            processedAsOfNow = (self.totalFileNum - self.queue.qsize());
             processedJustNow = processedAsOfNow - alreadyProcessedFiles;
             alreadyProcessedFiles = processedAsOfNow;
 
             # advance progressbar
-            self.pb.step(processedJustNow / float(totalFileNum) * 100.0);
-            totalUsedTime = (time.time() - start_time);
+            self.gui.pb.step(processedJustNow / float(self.totalFileNum) * 100.0);
+            totalUsedTime = (time.time() - self.start_time);
 
             # update estimated time
-            self.remainingTimeLabel.config(text=Lang.get('Remaining time: %.2f seconds ') % self.estimateRemainingTime(
+            self.gui.remainingTimeLabel.config(text=Lang.get('Remaining time: %.2f seconds ') % self.estimateRemainingTime(
                 len(self.config.opt['inputFiles']), alreadyProcessedFiles, totalUsedTime));
 
             # propagate changes to GUI
-            self.parent.update();
+            self.gui.parent.update();
             time.sleep(0.5);
 
 
@@ -121,8 +128,36 @@ class BatchProcessor:
         self.executionLog.append('\n'+ Lang.get('Execution log:'))
 
 
+        #for debugging, only very first file will be processed
+        if(self.config.opt['simulateProcessing']):
+
+            #if we do not accumulate, choose only one
+            if not(self.config.opt['accumulateData']):
+                self.config.opt['inputFiles'] = self.config.opt['inputFiles'][0:1]
+            #otherwise, we need two
+            else:
+                self.config.opt['inputFiles'] = self.config.opt['inputFiles'][0:2]
+
+
+        # we need copy here: we may reload the configuration file and do not want to
+        # remove files permanently.
+        inputFilesToUse = self.config.opt['inputFiles'][:]
+        self.totalFileNum = 0
+        #if we accumulate data, move and rename the very last entry, but do not touch the others
+        if(self.config.opt['accumulateData']):
+            lastFilePath = inputFilesToUse.pop()
+            self.totalFileNum += 1
+            newFilePath = self.config.opt['outputDir'] + '/' + Configuration.accumulationFileName
+            shutil.copyfile(lastFilePath, newFilePath)
+
+            #furthermore, set spss execution file to template
+            self.config.opt['spssFile']             = Configuration.accumulationFileTemplate
+            self.config.opt['inputRegexPattern']    = self.config.opt['accumulationFilePattern']
+
+
+        self.start_time = time.time()
         # fill up queue of tasks/files
-        for filePath in self.config.opt['inputFiles']:
+        for filePath in inputFilesToUse:
             self.defineDefaultPlaceholders(filePath);
             outputFilePath = self.getOutputFilePath(filePath);
             # attention: pickling in Python is seriously broken. passing self.config will mess up the configuration
@@ -130,23 +165,24 @@ class BatchProcessor:
             # parsing it to JSON and converting back works just fine.
             configStr = self.config.toJSON();
             self.queue.put([filePath, outputFilePath, configStr]);
+            self.totalFileNum += 1
 
 
 
 
     def showDebuggingInformation(self, debuggingInfo):
-        t = tk.Toplevel(self.parent)
+        t = tk.Toplevel(self.gui.parent)
         t.wm_title(Lang.get("Debugging information"))
 
         #organize placeholders and resulting source code into panes
-        n = tk.Notebook(t)
+        n = ttk.Notebook(t)
 
-        n.add(self.createFrameWithText(n, debuggingInfo['placeholders']), text=Lang.get('Placeholders'))
-        n.add(self.createFrameWithText(n, debuggingInfo['commands']), text=Lang.get('Sourcecode'))
+        n.add(self.gui.createFrameWithText(n, debuggingInfo['placeholders']), text=Lang.get('Placeholders'))
+        n.add(self.gui.createFrameWithText(n, debuggingInfo['commands']), text=Lang.get('Sourcecode'))
         n.pack(expand=1, fill="both")
 
         # propagate changes to GUI
-        self.parent.update();
+        self.gui.parent.update();
 
 
     def estimateRemainingTime(self, totalFiles, processedFiles, usedTime):
@@ -230,7 +266,6 @@ class BatchProcessor:
             command = BatchProcessor.applyPlaceholders(command, config)
             allCommands.append(command)
 
-
             #submit command itself to SPSS
             # TODO: deal with errors, how? Currently, they show up in console. Probably best way to go anyway.
             if(not(config.opt['simulateProcessing'])):
@@ -238,6 +273,10 @@ class BatchProcessor:
                 #spss.Submit(command + ".");
 
         try:
+            pointPlusNewline = '.' + os.linesep
+            debuggingResultQueue.put({'placeholders': config.ObjToJSON(config.opt['placeholders']), 'commands':
+                pointPlusNewline.join(allCommands)});
+
             BatchProcessor.executor.execute(allCommands)
         except subprocess.CalledProcessError as e:
             #halt processing
@@ -248,8 +287,6 @@ class BatchProcessor:
 
         usedTime = (time.time() - start_time);
         logQueue.put(Lang.get('Processing finished in {:.2f}s').format(usedTime))
-        debuggingResultQueue.put({'placeholders' : config.ObjToJSON(config.opt['placeholders']), 'commands' :
-            allCommands});
 
         return usedTime;
 
@@ -349,9 +386,9 @@ class BatchProcessor:
 
     #initialize with process and queue; please note that as TK handles _cannot_ be pickled, we need to create
     #structures related to multiprocessing _before_ initializing the GUI (i.e. this class)
-    def __init__(self, gui, parent, workerProcess, logQueue, taskQueue, debuggingResultQueue):
+    def __init__(self, gui, parent, workerProcess, logQueue, taskQueue, debuggingResultQueue, errorQueue):
         self.p = workerProcess;
-        self.queue, self.logQueue, self.debuggingResultQueue = taskQueue, logQueue, debuggingResultQueue;
+        self.queue, self.logQueue, self.debuggingResultQueue, self.errorQueue = taskQueue, logQueue, debuggingResultQueue, errorQueue;
         self.config = Configuration();
 
         parent.title(Lang.get("BatchProcessing"))
@@ -359,5 +396,7 @@ class BatchProcessor:
 
         self.parseCommandLine()
         self.loadPredefinedConfiguration()
+
+        self.executionLog = []
 
 

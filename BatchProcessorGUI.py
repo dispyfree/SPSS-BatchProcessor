@@ -4,6 +4,7 @@ import tkinter.filedialog
 import tkinter.messagebox
 import tkinter.ttk as ttk
 import os
+import tkinter.scrolledtext
 import string
 
 from Lang import Lang
@@ -99,8 +100,8 @@ class BatchProcessorGUI:
                                                                                            sticky=tk.W);
         self.inputRegexPattern = tk.StringVar()
         self.inputRegexPattern.set('(?P<fileName>[\w]*).txt');
-        inputRegexEntry = tk.Entry(self.configurationPane, textvariable=self.inputRegexPattern, **self.getItemStyle())
-        inputRegexEntry.grid(row=1, column=1, sticky=tk.W + tk.E, columnspan=2)
+        self.inputRegexEntry = tk.Entry(self.configurationPane, textvariable=self.inputRegexPattern, **self.getItemStyle())
+        self.inputRegexEntry.grid(row=1, column=1, sticky=tk.W + tk.E, columnspan=2)
 
         # processing spss file
         self.processSPSSFileLabel = tk.Label(self.configurationPane, text=Lang.get("Processing SPSS file"), **self.getItemStyle()).grid(row=2, column=0,
@@ -110,16 +111,17 @@ class BatchProcessorGUI:
         self.spssFileLabel = tk.Label(self.configurationPane, text=self.spssFile.get(), **self.getItemStyle());
         self.spssFileLabel.grid(row=2, column=1, sticky=tk.W + tk.E);
         self.selectSPSSFileButton = tk.Button(self.configurationPane, text=Lang.get("Select SPSS file"),
-                                   command=self.selectSPSSFile, **self.getItemStyle()).grid(row=2, column=2,
-                                                                                            sticky=tk.W)
+                                   command=self.selectSPSSFile, **self.getItemStyle())
+        self.selectSPSSFileButton.grid(row=2, column=2,sticky=tk.W)
+
 
         # ouptut file pattern
         tk.Label(self.configurationPane, text=Lang.get("Output file pattern"), **self.getItemStyle()).grid(row=3, column=0,
                                                                                            sticky=tk.W);
         self.outputFilePattern = tk.StringVar()
         self.outputFilePattern.set('<fileName>.sav');
-        outputEntry = tk.Entry(self.configurationPane, textvariable=self.outputFilePattern, **self.getItemStyle())
-        outputEntry.grid(row=3, column=1, sticky=tk.W + tk.E)
+        self.outputEntry = tk.Entry(self.configurationPane, textvariable=self.outputFilePattern, **self.getItemStyle())
+        self.outputEntry.grid(row=3, column=1, sticky=tk.W + tk.E)
 
         # ouptut directory
         tk.Label(self.configurationPane, text=Lang.get("Output directory"), **self.getItemStyle()).grid(row=4, column=0, sticky=tk.W);
@@ -131,9 +133,19 @@ class BatchProcessorGUI:
                                        command=self.selectOutDir, **self.getItemStyle())
         selectOutDirButton.grid(row=4, column=2, sticky=tk.W);
 
+        # special functions
+        tk.Label(self.configurationPane, text=Lang.get("Special Functions"), **self.getItemStyle()).grid(row=5,
+                                                                                                         column=0,
+                                                                                                         sticky=tk.W);
+        self.accumulateDataVar = tk.IntVar()
+        self.accumulateDataButton = tk.Checkbutton(self.configurationPane, text=Lang.get("Accumulate Data"),
+                                                   variable=self.accumulateDataVar,
+                                                   command = self.updateByAccumulateButton,
+                                                   indicatoron=0, **self.getItemStyle());
+        self.accumulateDataButton.grid(row=5, column=1, sticky=tk.W + tk.E + tk.N + tk.S)
+
         self.pad(self.configurationPane)
         self.notebook.add(self.configurationPane, text=Lang.get('Configuration'))
-        #self.notebook.pack(fill=tk.BOTH, expand=1, padx=10, pady=10)
 
 
 
@@ -259,7 +271,7 @@ class BatchProcessorGUI:
 
     def createFrameWithText(self, parent, textValue):
         frame = tk.Frame(parent)
-        t = ScrolledText(frame, undo=True)
+        t = tkinter.scrolledtext.ScrolledText(frame, undo=True)
         t.pack()
         t.insert(tk.END, textValue)
         return frame
@@ -282,6 +294,7 @@ class BatchProcessorGUI:
 
         for file in self.conf('inputFiles'):
             self.selectedFilesList.insert(self.selectedFilesList.size(), file)
+
 
 
     def removeSelectedFiles(self):
@@ -343,6 +356,21 @@ class BatchProcessorGUI:
     def setConf(self, entry, value):
         self.backend.config.opt[entry] = value;
 
+
+    def updateByAccumulateButton(self):
+        # first, disable/enable other buttons
+        othersState = 'normal'
+        if(self.accumulateDataVar.get() == 1.0):
+            othersState = 'disabled'
+
+        self.inputRegexEntry.config(state = othersState)
+        self.spssFileLabel.config(state = othersState)
+        self.selectSPSSFileButton.config(state = othersState)
+        self.outputEntry.config(state=othersState)
+
+        self.parent.update()
+
+
     def updateConfigGUI(self):
         # TODO: u: wtf??!!
         self.inputSearchPattern.set(self.conf(u'inputSearchPattern'));
@@ -351,6 +379,8 @@ class BatchProcessorGUI:
         self.spssFileLabel.config(text=self.spssFile.get());
         self.outputFilePattern.set(self.conf(u'outputFilePattern'));
         self.outputDir.set(self.conf(u'outputDir'));
+        self.simulateProcessingVar.set(self.conf('simulateProcessing'))
+        self.accumulateDataVar.set(self.conf('accumulateData'))
         self.populateSelectedFileList()
 
 
@@ -360,6 +390,9 @@ class BatchProcessorGUI:
         self.setConf('spssFile', self.spssFile.get())
         self.setConf('outputFilePattern', self.outputFilePattern.get())
         self.setConf('outputDir', self.outputDir.get())
+        self.setConf('simulateProcessing', self.simulateProcessingVar.get() == 1.0)
+        self.setConf('accumulateData', self.accumulateDataVar.get() == 1.0)
+
 
 
     def loadConfig(self):
@@ -375,10 +408,12 @@ class BatchProcessorGUI:
         self.setConf('defaultConfigDir', os.path.dirname(filePath))
         self.updateConfigGUI();
 
-        self.loadedConfigurationFilePaths.append(filePath)
+        #only add if it's not there yet
+        if(filePath not in self.loadedConfigurationFilePaths):
+            self.loadedConfigurationFilePaths.insert(0, filePath)
+
         self.propagateToUserState()
-        tk.messagebox.showinfo(Lang.get("Configuration file loaded"), Lang.get("The following settings have been loaded: ") +
-                              self.backend.config.toJSON());
+        self.updateByAccumulateButton()
 
 
     #prompts the user for a filename and saves the configuration there

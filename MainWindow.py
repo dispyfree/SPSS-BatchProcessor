@@ -10,6 +10,7 @@ from Configuration import Configuration
 from multiprocessing import Process, Queue
 from BatchProcessorGUI import BatchProcessorGUI
 from batchProcessor import BatchProcessor
+from LastActionsSelectionGUI import LastActionsSelectionGUI
 
 from Lang import Lang
 
@@ -48,7 +49,7 @@ class MainWindow:
 
     def redoAction(self):
         self.showBatchProcessor()
-        lastActionFilePath = self.state['actions']['recentActions'][-1]
+        lastActionFilePath = self.state['actions']['recentActions'][0]
         self.gui.loadConfigFromFile(lastActionFilePath)
         #todo: execute right away
 
@@ -104,7 +105,7 @@ class MainWindow:
 
         self.actionsFrame = tkinter.Frame(self.centerFrame)
         self.recentActionsButton = tk.Button(self.actionsFrame, text=Lang.get("Last Actions"),
-                                              command=self.redoAction, **self.getItemStyle())
+                                              command=self.selectAmongLastActions, **self.getItemStyle())
         self.recentActionsButton.grid(row=0, column=0, sticky=tk.W + tk.E)
 
         self.redoLastActionButton = tk.Button(self.actionsFrame, text=Lang.get("Redo Last"),
@@ -134,6 +135,12 @@ class MainWindow:
         spssToolboxLabel.grid(pady = (0, 30))
         self.centerFrame.pack()
         self.adaptGUIToState()
+
+
+
+    def selectAmongLastActions(self):
+        LastActionsSelectionGUI(tk.Toplevel(self.parent), self)
+
 
 
 
@@ -179,7 +186,8 @@ class MainWindow:
                               'workerProcess': self.p,
                               'taskQueue': self.taskQueue,
                               'logQueue' : self.logQueue,
-                              'debuggingResultQueue': self.debuggingResultQueue,}
+                              'debuggingResultQueue': self.debuggingResultQueue,
+                              'errorQueue': self.errorQueue}
         self.gui = BatchProcessorGUI(tk.Toplevel(self.parent), self, batchProcessorArgs);
 
 

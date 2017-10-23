@@ -5,7 +5,7 @@ class Configuration:
     opt = {'inputSearchPattern': '', 'inputRegexPattern': '', 'outputFilePattern': '', 'outputDir': '',
            'placeholders': '', 'spssFile': '', 'defaultConfigDir': '', 'defaultSPSSDir': '', 'defaultInputDir': '',
            'defaultOutDir': '', 'programVersion': currentVersion, 'simulateProcessing': False,
-           'inputFiles' : []};
+           'inputFiles' : [], 'accumulateData' : False, 'accumulationFilePattern' : ''};
     reservedPlaceholders = opt.keys();
 
     """
@@ -71,6 +71,11 @@ class Configuration:
 
     # by default do NOT simulate
     opt['simulateProcessing'] = False;
+    opt['accumulateData'] = False
+    opt['accumulationFilePattern'] = '(?P<fileName>[\w]*).sav'
+
+    accumulationFileName ='accumulate.sav'
+    accumulationFileTemplate = './workflow/Schritt_2_Zusammenfügen_der_SavDateien.sps'
 
     def getCurrentVersion(self):
         return self.currentVersion;

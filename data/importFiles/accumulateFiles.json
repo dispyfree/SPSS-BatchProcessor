@@ -1,0 +1,24 @@
+{
+    "accumulateData": true,
+    "defaultConfigDir": "/home/valentin/data/work/psych/SPSS-Toolbox/batchProcessor/data/importFiles",
+    "defaultInputDir": "/home/valentin/data/work/psych/SPSS-Toolbox/batchProcessor/data/importFiles/out",
+    "defaultOutDir": "/home/valentin/data/work/psych/SPSS-Toolbox/batchProcessor/data/importFiles/accumulated",
+    "defaultSPSSDir": ".",
+    "inputFiles": [
+        "/home/valentin/data/work/psych/SPSS-Toolbox/batchProcessor/data/importFiles/out/data.sav",
+        "/home/valentin/data/work/psych/SPSS-Toolbox/batchProcessor/data/importFiles/out/data2.sav"
+    ],
+    "inputRegexPattern": "(?P<fileName>[\\w]*).txt",
+    "inputSearchPattern": ".txt",
+    "outputDir": "/home/valentin/data/work/psych/SPSS-Toolbox/batchProcessor/data/importFiles/accumulated",
+    "outputFilePattern": "<fileName>.sav",
+    "placeholders": {
+        "DUMMY": "DUMMY",
+        "INFILE": "",
+        "OUTPUTFILE": ""
+    },
+    "programVersion": 0.8,
+    "simulateProcessing": false,
+    "spssFile": "none selected",
+    "accumulationFilePattern" : "(?P<fileName>[\\w]*).sav"
+}

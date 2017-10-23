@@ -1,0 +1,21 @@
+{
+    "defaultConfigDir": "/home/valentin/data/work/psych/SPSS-Toolbox/batchProcessor/data/importFiles",
+    "defaultInputDir": "/home/valentin/data/work/psych/SPSS-Toolbox/batchProcessor/data/importFiles",
+    "defaultOutDir": "/home/valentin/data/work/psych/SPSS-Toolbox/batchProcessor/data/importFiles/out",
+    "defaultSPSSDir": "/home/valentin/data/work/psych/SPSS-Toolbox/batchProcessor/data/importFiles",
+    "inputFiles": [
+        "/home/valentin/data/work/psych/SPSS-Toolbox/batchProcessor/data/importFiles/data.csv"
+    ],
+    "inputRegexPattern": "(?P<fileName>[\\w]*).csv",
+    "inputSearchPattern": ".csv",
+    "outputDir": "/home/valentin/data/work/psych/SPSS-Toolbox/batchProcessor/data/importFiles/out",
+    "outputFilePattern": "<fileName>.sav",
+    "placeholders": {
+        "DUMMY": "DUMMY",
+        "INFILE": "",
+        "OUTPUTFILE": ""
+    },
+    "programVersion": 0.8,
+    "simulateProcessing": false,
+    "spssFile": "/home/valentin/data/work/psych/SPSS-Toolbox/batchProcessor/data/importFiles/importFiles.sps"
+}
