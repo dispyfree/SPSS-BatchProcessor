@@ -1,10 +1,10 @@
 * Encoding: UTF-8.
 
 *Fz.
-GET FILE="D:\Uni\Trust_Game_FOV_SS_2017_BDF\SPSS\sav\Pbn_c_fair_Filter.sav".
+GET FILE="\sav\Pbn_c_fair_Filter.sav".
 select if (CASE_LBL="Fz").
 execute.
-SAVE OUTFILE='D:\Uni\Trust_Game_FOV_SS_2017_BDF\SPSS\sav\Pbn_c_fair_FilterFz.sav'
+SAVE OUTFILE='\sav\Pbn_c_fair_FilterFz.sav'
   /COMPRESSED.
 FLIP VARIABLES=CASE_LBL var001 var002 var003 var004 var005 var006 var007 var008 var009 var010 var011 var012 var013 var014 
 var015 var016 var017 var018 var019 var020 var021 var022 var023 var024 var025 var026 var027 var028 var029 var030 var031 var032 var033 
@@ -38,19 +38,19 @@ var508 var509 var510 var511 var512 var513 var514 var515 var516 var517 var518 var
 var527 var528 var529 var530 var531 var532 var533 var534 var535 var536 var537 var538 var539 var540 var541 var542
 var543 var544 var545 var546 var547 var548 var549 var550 var551 var552 var553 var554 var555 var556 var557 var558 var559 var560 var561 
 var562 var563.
-SAVE OUTFILE='D:\Uni\Trust_Game_FOV_SS_2017_BDF\SPSS\sav\Pbn_c_fair_FilterFz_t.sav'
+SAVE OUTFILE='Pbn_c_fair_FilterFz_t.sav'
   /COMPRESSED.
 compute fz_fair=mean(Fz to Fz_AA).
 execute.
-SAVE OUTFILE='D:\Uni\Trust_Game_FOV_SS_2017_BDF\SPSS\sav\Pbn_c_fair_FilterFz_tt.sav'
+SAVE OUTFILE='\sav\Pbn_c_fair_FilterFz_tt.sav'
   /COMPRESSED.
 
 
 *Cz.
-GET FILE="D:\Uni\Trust_Game_FOV_SS_2017_BDF\SPSS\sav\Pbn_c_fair_Filter.sav".
+GET FILE="sav\Pbn_c_fair_Filter.sav".
 select if (CASE_LBL="Cz").
 execute.
-SAVE OUTFILE='D:\Uni\Trust_Game_FOV_SS_2017_BDF\SPSS\sav\Pbn_c_fair_FilterCz.sav'
+SAVE OUTFILE='sav\Pbn_c_fair_FilterCz.sav'
   /COMPRESSED.
 FLIP VARIABLES=CASE_LBL var001 var002 var003 var004 var005 var006 var007 var008 var009 var010 var011 var012 var013 var014 
 var015 var016 var017 var018 var019 var020 var021 var022 var023 var024 var025 var026 var027 var028 var029 var030 var031 var032 var033 
@@ -84,18 +84,18 @@ var508 var509 var510 var511 var512 var513 var514 var515 var516 var517 var518 var
 var527 var528 var529 var530 var531 var532 var533 var534 var535 var536 var537 var538 var539 var540 var541 var542
 var543 var544 var545 var546 var547 var548 var549 var550 var551 var552 var553 var554 var555 var556 var557 var558 var559 var560 var561 
 var562 var563.
-SAVE OUTFILE='D:\Uni\Trust_Game_FOV_SS_2017_BDF\SPSS\sav\Pbn_c_fair_FilterCz_t.sav'
+SAVE OUTFILE='Pbn_c_fair_FilterCz_t.sav'
   /COMPRESSED.
 compute cz_fair=mean(Cz to Cz_AA).
 execute.
-SAVE OUTFILE='D:\Uni\Trust_Game_FOV_SS_2017_BDF\SPSS\sav\Pbn_c_fair_FilterCz_tt.sav'
+SAVE OUTFILE='Pbn_c_fair_FilterCz_tt.sav'
   /COMPRESSED.
 
 *Pz.
-GET FILE="D:\Uni\Trust_Game_FOV_SS_2017_BDF\SPSS\sav\Pbn_c_fair_Filter.sav".
+GET FILE="Pbn_c_fair_Filter.sav".
 select if (CASE_LBL="Pz").
 execute.
-SAVE OUTFILE='D:\Uni\Trust_Game_FOV_SS_2017_BDF\SPSS\sav\Pbn_c_fair_FilterPz.sav'
+SAVE OUTFILE='Pbn_c_fair_FilterPz.sav'
   /COMPRESSED.
 FLIP VARIABLES=CASE_LBL var001 var002 var003 var004 var005 var006 var007 var008 var009 var010 var011 var012 var013 var014 
 var015 var016 var017 var018 var019 var020 var021 var022 var023 var024 var025 var026 var027 var028 var029 var030 var031 var032 var033 
@@ -129,10 +129,10 @@ var508 var509 var510 var511 var512 var513 var514 var515 var516 var517 var518 var
 var527 var528 var529 var530 var531 var532 var533 var534 var535 var536 var537 var538 var539 var540 var541 var542
 var543 var544 var545 var546 var547 var548 var549 var550 var551 var552 var553 var554 var555 var556 var557 var558 var559 var560 var561 
 var562 var563.
-SAVE OUTFILE='D:\Uni\Trust_Game_FOV_SS_2017_BDF\SPSS\sav\Pbn_c_fair_FilterPz_t.sav'
+SAVE OUTFILE='Pbn_c_fair_FilterPz_t.sav'
   /COMPRESSED.
 compute pz_fair=mean(Pz to Pz_AB).
 execute.
-SAVE OUTFILE='D:\Uni\Trust_Game_FOV_SS_2017_BDF\SPSS\sav\Pbn_c_fair_FilterPz_tt.sav'
+SAVE OUTFILE='Pbn_c_fair_FilterPz_tt.sav'
   /COMPRESSED.
 

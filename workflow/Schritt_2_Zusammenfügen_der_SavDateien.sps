@@ -1,10 +1,8 @@
-﻿* Encoding: UTF-8.
-* Encoding: .
 * Encoding: UTF-8.
 
 GET
   /FILE='<OUTPUTDIR>accumulate.sav'.
-ADD FILES 
+ADD FILES
 	/FILE=*
 	/FILE='<INFILE>'.
 
