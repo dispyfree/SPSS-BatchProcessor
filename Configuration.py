@@ -101,7 +101,7 @@ class Configuration:
     """
     Template for merging/accumulating data files
     """
-    accumulationFileTemplate = './workflow/Schritt_2_Zusammenfügen_der_SavDateien.sps'
+    accumulationFileTemplate = 'C:/Users/admin/Documents/valentin/BatchProcessor/workflow/Schritt_2_Zusammenfügen_der_SavDateien.sps'
 
     def getCurrentVersion(self):
         return self.currentVersion;

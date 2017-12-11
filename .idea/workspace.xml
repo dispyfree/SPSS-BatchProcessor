@@ -1,13 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ef58e443-690d-4dd2-8360-0575a8056b0e" name="Default" comment="- fixed execution for PSPP&#10;- fixed displayed error messages&#10;- overhauled execution interface">
+    <list default="true" id="ef58e443-690d-4dd2-8360-0575a8056b0e" name="Default" comment="- fixed execution for PSPP&#10;- fixed displayed error messages&#10;- overhauled execution interface&#10;&#10;- fixed critical bug: placeholders from previous files were mistaken for predefined placeholders&#10;  (new behavior: throws an exception upon detection of placeholder clash)">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/importFiles/out/data.sav" afterPath="$PROJECT_DIR$/data/importFiles/out/data.sav" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/BatchProcessorGUI.py" afterPath="$PROJECT_DIR$/BatchProcessorGUI.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Configuration.py" afterPath="$PROJECT_DIR$/Configuration.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/GUIComponent.py" afterPath="$PROJECT_DIR$/GUIComponent.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Lang.py" afterPath="$PROJECT_DIR$/Lang.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LastActionsSelectionGUI.py" afterPath="$PROJECT_DIR$/LastActionsSelectionGUI.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MainWindow.py" afterPath="$PROJECT_DIR$/MainWindow.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PSPPExecutor.py" afterPath="$PROJECT_DIR$/PSPPExecutor.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/batchProcessor.py" afterPath="$PROJECT_DIR$/batchProcessor.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/importFiles/accumulateFiles.json" afterPath="$PROJECT_DIR$/data/importFiles/accumulateFiles.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/importFiles/importFiles.json" afterPath="$PROJECT_DIR$/data/importFiles/importFiles.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/importFiles/in/data.csv" afterPath="$PROJECT_DIR$/data/importFiles/in/data.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/doc.aux" afterPath="$PROJECT_DIR$/doc/doc.aux" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/doc.tex" afterPath="$PROJECT_DIR$/doc/doc.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/doc.toc" afterPath="$PROJECT_DIR$/doc/doc.toc" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/workflow/Schritt_2_Zusammenfügen_der_SavDateien.sps" afterPath="$PROJECT_DIR$/workflow/Schritt_2_Zusammenfügen_der_SavDateien.sps" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -21,11 +35,9 @@
       <file leaf-file-name="batchProcessor.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/batchProcessor.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="222">
-              <caret line="174" column="54" lean-forward="true" selection-start-line="174" selection-start-column="54" selection-end-line="174" selection-end-column="54" />
-              <folding>
-                <element signature="e#565#585#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="219">
+              <caret line="237" column="10" lean-forward="false" selection-start-line="237" selection-start-column="10" selection-end-line="237" selection-end-column="10" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -33,11 +45,9 @@
       <file leaf-file-name="BatchProcessorGUI.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/BatchProcessorGUI.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-324">
+            <state relative-caret-position="5576">
               <caret line="340" column="19" lean-forward="false" selection-start-line="340" selection-start-column="8" selection-end-line="340" selection-end-column="19" />
-              <folding>
-                <element signature="e#1#21#0" expanded="true" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -45,7 +55,7 @@
       <file leaf-file-name="Lang.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Lang.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="126">
+            <state relative-caret-position="68">
               <caret line="4" column="329" lean-forward="false" selection-start-line="4" selection-start-column="329" selection-end-line="4" selection-end-column="329" />
               <folding />
             </state>
@@ -55,8 +65,8 @@
       <file leaf-file-name="Configuration.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Configuration.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-8">
-              <caret line="3" column="25" lean-forward="false" selection-start-line="3" selection-start-column="25" selection-end-line="3" selection-end-column="25" />
+            <state relative-caret-position="34">
+              <caret line="3" column="20" lean-forward="false" selection-start-line="3" selection-start-column="20" selection-end-line="3" selection-end-column="20" />
               <folding />
             </state>
           </provider>
@@ -65,8 +75,8 @@
       <file leaf-file-name="MainWindow.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/MainWindow.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="198">
-              <caret line="11" column="41" lean-forward="false" selection-start-line="11" selection-start-column="41" selection-end-line="11" selection-end-column="41" />
+            <state relative-caret-position="187">
+              <caret line="11" column="16" lean-forward="false" selection-start-line="11" selection-start-column="16" selection-end-line="11" selection-end-column="16" />
               <folding />
             </state>
           </provider>
@@ -172,23 +182,24 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
-              <item name="batchProcessor" type="b2602c69:ProjectViewProjectNode" />
-              <item name="batchProcessor" type="462c0819:PsiDirectoryNode" />
+              <item name="SPSS-BatchProcessor" type="b2602c69:ProjectViewProjectNode" />
+              <item name="SPSS-BatchProcessor" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
       <pane id="Scope" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="settings.editor.selected.configurable" value="preferences.editor" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -209,9 +220,9 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="" />
+      <option name="SDK_HOME" value="C:\Program Files\IBM\SPSS\Statistics\24\Python3\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
+      <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="batchProcessor" />
@@ -279,10 +290,10 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="-4" width="1366" height="772" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2659091" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22395024" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.265625" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2230444" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32868218" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -307,7 +318,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="- file list copyable to clipboard" />
     <MESSAGE value="- fixed execution for PSPP&#10;- fixed displayed error messages&#10;- overhauled execution interface" />
-    <option name="LAST_COMMIT_MESSAGE" value="- fixed execution for PSPP&#10;- fixed displayed error messages&#10;- overhauled execution interface" />
+    <MESSAGE value="- fixed execution for PSPP&#10;- fixed displayed error messages&#10;- overhauled execution interface&#10;&#10;- fixed critical bug: placeholders from previous files were mistaken for predefined placeholders&#10;  (new behavior: throws an exception upon detection of placeholder clash)" />
+    <option name="LAST_COMMIT_MESSAGE" value="- fixed execution for PSPP&#10;- fixed displayed error messages&#10;- overhauled execution interface&#10;&#10;- fixed critical bug: placeholders from previous files were mistaken for predefined placeholders&#10;  (new behavior: throws an exception upon detection of placeholder clash)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -318,11 +330,49 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/batchProcessor.py">
       <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/BatchProcessorGUI.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="5780">
+          <caret line="340" column="19" lean-forward="false" selection-start-line="340" selection-start-column="8" selection-end-line="340" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Lang.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" column="329" lean-forward="false" selection-start-line="4" selection-start-column="329" selection-end-line="4" selection-end-column="329" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Configuration.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="3" column="20" lean-forward="true" selection-start-line="3" selection-start-column="20" selection-end-line="3" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MainWindow.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="16" lean-forward="true" selection-start-line="11" selection-start-column="16" selection-end-line="11" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/batchProcessor.py">
+      <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4680">
           <caret line="277" column="68" lean-forward="false" selection-start-line="277" selection-start-column="68" selection-end-line="277" selection-end-column="68" />
-          <folding>
-            <element signature="e#565#585#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -338,9 +388,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3582">
           <caret line="206" column="28" lean-forward="false" selection-start-line="206" selection-start-column="28" selection-end-line="206" selection-end-column="28" />
-          <folding>
-            <element signature="e#1#21#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -348,9 +396,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4680">
           <caret line="277" column="68" lean-forward="false" selection-start-line="277" selection-start-column="68" selection-end-line="277" selection-end-column="68" />
-          <folding>
-            <element signature="e#565#585#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -358,9 +404,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3582">
           <caret line="206" column="28" lean-forward="false" selection-start-line="206" selection-start-column="28" selection-end-line="206" selection-end-column="28" />
-          <folding>
-            <element signature="e#1#21#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -376,9 +420,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#565#585#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -386,9 +428,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3672">
           <caret line="211" column="46" lean-forward="false" selection-start-line="211" selection-start-column="46" selection-end-line="211" selection-end-column="46" />
-          <folding>
-            <element signature="e#1#21#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -396,9 +436,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#565#585#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -406,9 +444,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2826">
           <caret line="164" column="56" lean-forward="false" selection-start-line="164" selection-start-column="54" selection-end-line="164" selection-end-column="56" />
-          <folding>
-            <element signature="e#1#21#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -438,19 +474,11 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#565#585#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file:///usr/lib/python3.5/tkinter/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="38016">
-          <caret line="2112" column="0" lean-forward="false" selection-start-line="2112" selection-start-column="0" selection-end-line="2112" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file:///usr/lib/python3.5/tkinter/__init__.py" />
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="306">
@@ -462,47 +490,15 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#565#585#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file:///usr/lib/python3.5/tkinter/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="38016">
-          <caret line="2112" column="0" lean-forward="false" selection-start-line="2112" selection-start-column="0" selection-end-line="2112" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/lib/python2.7/lib-tk/Tkinter.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="139">
-          <caret line="2093" column="0" lean-forward="false" selection-start-line="2093" selection-start-column="0" selection-end-line="2093" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/lib/python3.5/tkinter/ttk.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="164">
-          <caret line="1172" column="34" lean-forward="false" selection-start-line="1172" selection-start-column="24" selection-end-line="1172" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/lib/python3.5/configparser.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="1136" column="47" lean-forward="true" selection-start-line="1136" selection-start-column="47" selection-end-line="1136" selection-end-column="47" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/lib/python3.5/json/decoder.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="361">
-          <caret line="356" column="0" lean-forward="false" selection-start-line="356" selection-start-column="0" selection-end-line="356" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file:///usr/lib/python3.5/tkinter/__init__.py" />
+    <entry file="file:///usr/lib/python2.7/lib-tk/Tkinter.py" />
+    <entry file="file:///usr/lib/python3.5/tkinter/ttk.py" />
+    <entry file="file:///usr/lib/python3.5/configparser.py" />
+    <entry file="file:///usr/lib/python3.5/json/decoder.py" />
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="306">
@@ -510,34 +506,26 @@
         </state>
       </provider>
     </entry>
-    <entry file="file:///usr/lib/python3.5/tkinter/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="160">
-          <caret line="1133" column="0" lean-forward="false" selection-start-line="1133" selection-start-column="0" selection-end-line="1133" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file:///usr/lib/python3.5/tkinter/__init__.py" />
     <entry file="file://$PROJECT_DIR$/Configuration.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-8">
-          <caret line="3" column="25" lean-forward="false" selection-start-line="3" selection-start-column="25" selection-end-line="3" selection-end-column="25" />
+        <state relative-caret-position="34">
+          <caret line="3" column="20" lean-forward="false" selection-start-line="3" selection-start-column="20" selection-end-line="3" selection-end-column="20" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/BatchProcessorGUI.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-324">
+        <state relative-caret-position="5576">
           <caret line="340" column="19" lean-forward="false" selection-start-line="340" selection-start-column="8" selection-end-line="340" selection-end-column="19" />
-          <folding>
-            <element signature="e#1#21#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Lang.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
+        <state relative-caret-position="68">
           <caret line="4" column="329" lean-forward="false" selection-start-line="4" selection-start-column="329" selection-end-line="4" selection-end-column="329" />
           <folding />
         </state>
@@ -545,19 +533,17 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/MainWindow.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="11" column="41" lean-forward="false" selection-start-line="11" selection-start-column="41" selection-end-line="11" selection-end-column="41" />
+        <state relative-caret-position="187">
+          <caret line="11" column="16" lean-forward="false" selection-start-line="11" selection-start-column="16" selection-end-line="11" selection-end-column="16" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/batchProcessor.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="222">
-          <caret line="174" column="54" lean-forward="true" selection-start-line="174" selection-start-column="54" selection-end-line="174" selection-end-column="54" />
-          <folding>
-            <element signature="e#565#585#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="219">
+          <caret line="237" column="10" lean-forward="false" selection-start-line="237" selection-start-column="10" selection-end-line="237" selection-end-column="10" />
+          <folding />
         </state>
       </provider>
     </entry>

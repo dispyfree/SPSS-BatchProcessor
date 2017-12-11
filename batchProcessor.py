@@ -33,7 +33,7 @@ import shutil
 from Lang import Lang
 from Configuration import Configuration
 from PSPPExecutor import PSPPExecutor
-
+from SPSSExecutor import SPSSExecutor
 
 class BatchProcessor:
     """
@@ -44,7 +44,7 @@ class BatchProcessor:
     Wraps execution by a specific statistics engine. 
     Available are PSPPExecutor and SPSSExecutor
     """
-    executor = PSPPExecutor()
+    executor = SPSSExecutor()
 
 
     # SPSS Processing
@@ -180,6 +180,8 @@ class BatchProcessor:
         """
         lastFilePath = inputFilesToUse.pop()
         self.totalFileNum += 1
+        #override with input from GUI
+        Configuration.accumulationFileName  = self.config.opt['outputFilePattern'];
         newFilePath = os.path.join(self.config.opt['outputDir'], Configuration.accumulationFileName)
         shutil.copyfile(lastFilePath, newFilePath)
 
@@ -227,17 +229,15 @@ class BatchProcessor:
         :param config: key 'spssFile' will be used
         :return: list of commands
         """
-        try:
-            with io.open(config.opt['spssFile'], "r", encoding='utf8') as f:
-                if(f == None):
-                    cls.err(Lang.get("Unable to obtain file handle for SPSS file"))
-                else:
-                    spssCommands = f.read()
-            #by definition, commands end with "." and a newline
-            spssCommands = spssCommands.split("." + os.linesep);
-            return spssCommands
-        except:
-            cls.err(Lang.get("Unable to open SPSS file"))
+        with io.open(config.opt['spssFile'], "r", encoding='utf8') as f:
+            if(f == None):
+                cls.err(Lang.get("Unable to obtain file handle for SPSS file"))
+            else:
+                spssCommands = f.read()
+        #by definition, commands end with "." and a newline
+        #@todo: check if there's a way to catch \n and \r\n simultaneously
+        spssCommands = spssCommands.split(".\n");
+        return spssCommands
 
 
 
@@ -250,10 +250,10 @@ class BatchProcessor:
         # set special placeholders
         config.opt['placeholders']['INFILE'] = inputFilePath;
         # input Path doesn't have a trailing slash
-        config.opt['placeholders']['INPUTDIR'] = inputPath + os.sep;
+        config.opt['placeholders']['INPUTDIR'] = inputPath + '/';
         config.opt['placeholders']['OUTPUTFILE'] = outputFilePath;
         # output Path doesn't have a trailing slash
-        config.opt['placeholders']['OUTPUTDIR'] = config.opt['outputDir'] + os.sep;
+        config.opt['placeholders']['OUTPUTDIR'] = config.opt['outputDir'] + '/';
         config.opt['placeholders']['fileName'] = basename(inputFilePath);
 
         # incorporate the capture groups in the input file name into REGEX file
@@ -334,12 +334,17 @@ class BatchProcessor:
 
     def defineDefaultPlaceholders(self, inputFilePath):
         inputPath, fileName = os.path.split(inputFilePath);
+
+        # reset all placeholders. This is mandatory, as previous runs (other subjects) may have left values here
+        # however, ALL placeholders existing before applying custom placeholders are considered to be PREDEFINED
+        # (and will thus not be affected by custom placeholders)
+        self.config.opt['placeholders'] = {};
         # set special placeholders
         self.config.opt['placeholders']['INFILE'] = inputFilePath;
         # input Path doesn't have a trailing slash
-        self.config.opt['placeholders']['INPUTDIR'] = inputPath + os.sep;
+        self.config.opt['placeholders']['INPUTDIR'] = inputPath + '/';
         # output Path doesn't have a trailing slash
-        self.config.opt['placeholders']['OUTPUTDIR'] = self.config.opt['outputDir'] + os.sep;
+        self.config.opt['placeholders']['OUTPUTDIR'] = self.config.opt['outputDir'] + '/';
         self.config.opt['placeholders']['fileName'] = basename(inputFilePath);
 
 
@@ -371,13 +376,18 @@ class BatchProcessor:
                     replacement = self.config.opt['placeholders'][placeholder];
                 else:
                     replacement = m.group(placeholder)
+                    # if placeholder is PREDEFINED (already exists in above array), this is a serisous error
+                    # predefined placeholders may NOT be overwritten.
+                    if(placeholder in self.config.opt['placeholders']):
+                        msg = Lang.get('Predefined placeholders must not be redefined: attempted to define placeholder,  which already exists: ');
+                        raise RuntimeError( msg + ' ' + placeholder);
             except IndexError:
                 BatchProcessor.err(Lang.get("Placeholder in ouput file pattern refers to a placeholder which has not been defined"));
 
             # perhaps the placeholder is not in use after all (defined but not populated)
             if(replacement != None):
                 outputFileName = outputFileName.replace('<' + placeholder + '>', replacement)
-        return self.config.opt['outputDir'] + os.sep + outputFileName
+        return self.config.opt['outputDir'] + '/' + outputFileName
 
 
 

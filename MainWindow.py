@@ -112,8 +112,7 @@ class MainWindow (GUIComponent):
         self.centerFrame = tkinter.Frame(self.mainWindow)
         self.centerFrame.configure(padx = 50, pady = 50, height=200, background='white')
 
-        spssToolboxLabel = tk.Label(self.centerFrame, text=Lang.get("SPSS Toolbox"), **self.getItemStyle(),
-                 font = ('Times', 25, 'bold'))
+        spssToolboxLabel = tk.Label(self.centerFrame, text=Lang.get("SPSS Toolbox"), font = ('Times', 25, 'bold'), **self.getItemStyle())
         spssToolboxLabel.grid(row=0, column=0, sticky=tk.W + tk.E);
 
 

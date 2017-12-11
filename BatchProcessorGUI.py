@@ -207,9 +207,8 @@ class BatchProcessorGUI (GUIComponent):
 
         #maximum space it will take up
         portionOfScreenWidth = self.w - 200
-        tk.Label(self.executionPane, text=Lang.get("runDescription"),
-                    **self.getItemStyle(), wraplength = portionOfScreenWidth,
-                 justify= tkinter.LEFT).grid(row=0, column=0, columnspan = 6, sticky=tk.W);
+        tk.Label(self.executionPane, text=Lang.get("runDescription"), wraplength = portionOfScreenWidth,
+                 justify= tkinter.LEFT, **self.getItemStyle()).grid(row=0, column=0, columnspan = 6, sticky=tk.W);
 
         # progress bar
         self.pb = ttk.Progressbar(self.executionPane, orient="horizontal", length=portionOfScreenWidth,mode="determinate");
