@@ -108,6 +108,12 @@ class BatchProcessor:
             self.gui.parent.update();
             time.sleep(0.5);
 
+        # when processing is finished, reset progress bar
+        # by default, maximum progress bar can reach is 100 - thus, decrease by just that amount.
+        self.gui.pb.step(-100.0)
+        # propagate changes to GUI
+        self.gui.parent.update();
+
 
 
     def transferLogQueue(self):
@@ -360,7 +366,8 @@ class BatchProcessor:
         self.inputFileNameMatch = m;
 
         if(m == None):
-            self.err(Lang.get("Could not match input filename with pattern. Please check defined and used placeholders. "));
+            msg = Lang.get("Could not match input filename with pattern. Please check defined and used placeholders. Affected file: ") +  oldFilePath
+            self.err(msg);
 
         # find all spots in the output file name to replace
         # they have the form <name1>, <name2> ...
