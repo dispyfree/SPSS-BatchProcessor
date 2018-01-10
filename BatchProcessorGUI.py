@@ -52,6 +52,14 @@ class BatchProcessorGUI (GUIComponent):
         options['initialdir'] = self.conf('defaultOutDir')
         return options;
 
+    # options for selection dialog of output directory
+    def getSyntaxOutputDirOptions(self):
+        options = {}
+        options['mustexist'] = False
+        options['title'] = Lang.get('Select syntax output directory')
+        options['initialdir'] = self.conf('defaultSyntaxOutDir')
+        return options;
+
 
     def __init__(self, parent, mainWindow, batchProcessorArgs):
         """
@@ -156,6 +164,17 @@ class BatchProcessorGUI (GUIComponent):
                                                    indicatoron=0, **self.getItemStyle());
         self.accumulateDataButton.grid(row=5, column=1, sticky=tk.W + tk.E + tk.N + tk.S)
 
+        # write out syntaxes
+        tk.Label(self.configurationPane, text=Lang.get("Syntax generation"), **self.getItemStyle()).grid(row=6, column=0, sticky=tk.W)
+        self.syntaxGenerationDirVar = tk.StringVar()
+        self.syntaxGenerationDirVar.set('none');
+        self.syntaxGenerationFolder = tk.Entry(self.configurationPane, textvariable=self.syntaxGenerationDirVar)
+        self.syntaxGenerationFolder.grid(row=6, column=1, sticky = tk.W + tk.E);
+        selectOutDirButton = tk.Button(self.configurationPane, text=Lang.get("Select output directory"),
+                                       command=self.selectSyntaxOutputDir, **self.getItemStyle())
+        selectOutDirButton.grid(row=6, column=2, sticky=tk.W);
+
+
         self.pad(self.configurationPane)
         self.notebook.add(self.configurationPane, text=Lang.get('Configuration'))
 
@@ -214,25 +233,28 @@ class BatchProcessorGUI (GUIComponent):
         self.pb = ttk.Progressbar(self.executionPane, orient="horizontal", length=portionOfScreenWidth,mode="determinate");
         self.pb.grid(row=2, column=0, sticky=tk.W + tk.E, columnspan=6)
 
+        #check output files
+        #todo: implement
+
         # Simulate
         self.simulateProcessingVar = tk.IntVar()
         self.simulateProcessingVar.set(0);  # defaults to no simulation
         self.simulateButton = tk.Checkbutton(self.executionPane, text=Lang.get("Simulate"),
                                              variable=self.simulateProcessingVar,
                                              indicatoron=0, **self.getItemStyle());
-        self.simulateButton.grid(row=4, column=0, sticky= tk.W + tk.E)
+        self.simulateButton.grid(row=5, column=0, sticky= tk.W + tk.E)
 
         # run button
         runButton = tk.Button(self.executionPane, text=Lang.get("Run"),
                               command=self.backend.runProcessing, **self.getItemStyle())
-        runButton.grid(row=4, column=1, columnspan = 5, sticky= tk.W + tk.E);
+        runButton.grid(row=5, column=1, columnspan = 5, sticky= tk.W + tk.E);
 
         self.remainingTimeLabel = tk.Label(self.executionPane, **self.getItemStyle());
-        self.remainingTimeLabel.grid(row=4, column=6, sticky= tk.W + tk.E);
+        self.remainingTimeLabel.grid(row=5, column=6, sticky= tk.W + tk.E);
 
         saveLog = tk.Button(self.executionPane, text=Lang.get("Save Processing Log"),
                             command=self.saveProcessingLog, **self.getItemStyle())
-        saveLog.grid(row=5, column=1, columnspan=5, sticky=tk.W + tk.E);
+        saveLog.grid(row=6, column=1, columnspan=5, sticky=tk.W + tk.E);
 
         self.pad(self.executionPane)
         self.notebook.add(self.executionPane, text=Lang.get('Execution'))
@@ -332,6 +354,17 @@ class BatchProcessorGUI (GUIComponent):
             self.outputDir.set(dirName)
             self.outputDirLabel.config(text=self.outputDir.get())
 
+    def selectSyntaxOutputDir(self):
+        """
+        Asks operator for output directory
+        """
+        dirName = tk.filedialog.askdirectory(**self.getSyntaxOutputDirOptions())
+        if dirName:
+            # set defaults
+            self.setConf('defaultSyntaxOutDir', dirName);
+            self.syntaxGenerationDirVar.set(dirName)
+            self.syntaxGenerationFolder.config(text=self.syntaxGenerationDirVar.get())
+
 
     def selectSPSSFile(self):
         """
@@ -348,7 +381,11 @@ class BatchProcessorGUI (GUIComponent):
     # Configuration management
     # ----------------------------------------------------------------------------------------------------------------
     def conf(self, entry):
-        return self.backend.config.opt[entry]
+        #todo: remove
+        if not(entry in self.backend.config.opt):
+            return ''
+        else:
+            return self.backend.config.opt[entry]
 
     def setConf(self, entry, value):
         self.backend.config.opt[entry] = value;
@@ -386,6 +423,7 @@ class BatchProcessorGUI (GUIComponent):
         self.simulateProcessingVar.set(self.conf('simulateProcessing'))
         self.accumulateDataVar.set(self.conf('accumulateData'))
         self.populateSelectedFileList()
+        self.syntaxGenerationDirVar.set(self.conf('defaultSyntaxOutDir'))
 
 
     def GUIToConfig(self):
@@ -399,7 +437,7 @@ class BatchProcessorGUI (GUIComponent):
         self.setConf('outputDir', self.outputDir.get())
         self.setConf('simulateProcessing', self.simulateProcessingVar.get() == 1.0)
         self.setConf('accumulateData', self.accumulateDataVar.get() == 1.0)
-
+        self.setConf('defaultSyntaxOutDir', self.syntaxGenerationDirVar.get() )
 
 
     def loadConfig(self):

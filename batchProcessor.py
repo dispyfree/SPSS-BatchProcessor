@@ -19,6 +19,7 @@ import tkinter.ttk as ttk
 
 #system imports
 import os
+import io
 from os.path import basename
 import re
 import queue
@@ -278,8 +279,8 @@ class BatchProcessor:
 
 
 
-    @staticmethod
-    def runSPSSProcessOnFile(inputFilePath, outputFilePath, config, logQueue, debuggingResultQueue, errorQueue):
+    @classmethod
+    def runSPSSProcessOnFile(cls, inputFilePath, outputFilePath, config, logQueue, debuggingResultQueue, errorQueue):
         """
         process single given file with SPSS template and save to output File
         returns the time it used up (in seconds)
@@ -322,12 +323,29 @@ class BatchProcessor:
             logQueue.put(Lang.get('Error occurred; execution incomplete'))
             raise
 
+        cls.saveCommandsToSyntaxFile(config, allCommands)
 
         usedTime = (time.time() - start_time);
         logQueue.put(Lang.get('Processing finished in {:.2f}s').format(usedTime))
 
         return usedTime;
 
+
+    @classmethod
+    def saveCommandsToSyntaxFile(cls, config, commands):
+        """
+            writes out an individual spss file for each subject; the naming is equivalent to
+            fileName + .sps
+            Please note that the toolbox currently does not support the generic generation of those filenames.
+        """
+        outDir = config.opt['defaultSyntaxOutDir']
+        if outDir != 'none':
+            origFileName = config.opt['placeholders']['fileName']
+            outFilePath = outDir + '/' + origFileName + '.sps'
+
+            with io.open(outFilePath, 'w+') as file:
+                for cmd in commands:
+                    file.write(cmd)
 
 
     @staticmethod

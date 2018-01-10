@@ -6,7 +6,7 @@ class Configuration:
     opt = {'inputSearchPattern': '', 'inputRegexPattern': '', 'outputFilePattern': '', 'outputDir': '',
            'placeholders': '', 'spssFile': '', 'defaultConfigDir': '', 'defaultSPSSDir': '', 'defaultInputDir': '',
            'defaultOutDir': '', 'programVersion': currentVersion, 'simulateProcessing': False,
-           'inputFiles' : [], 'accumulateData' : False, 'accumulationFilePattern' : ''};
+           'inputFiles' : [], 'accumulateData' : False, 'accumulationFilePattern' : '', 'defaultSyntaxOutDir' : ''};
     reservedPlaceholders = opt.keys();
 
     """
@@ -96,6 +96,13 @@ class Configuration:
     has to be adapted whenever this value is changed. 
     """
     accumulationFileName ='accumulate.sav'
+
+    """
+    Defines the directory to use for writing out transient SPSS syntax. 
+    If not 'none' but a real directory, for each input file "fileName.ext", a corresponding syntax file "fileName.sps" 
+    will be generated
+    """
+    opt['defaultSyntaxOutDir'] = 'none'
 
 
     """
