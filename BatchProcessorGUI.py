@@ -256,6 +256,19 @@ class BatchProcessorGUI (GUIComponent):
                             command=self.saveProcessingLog, **self.getItemStyle())
         saveLog.grid(row=6, column=1, columnspan=5, sticky=tk.W + tk.E);
 
+        # write out output
+        tk.Label(self.executionPane, text=Lang.get("Capture Output"), **self.getItemStyle()).grid(row=7,
+                                                                                                         column=0,
+                                                                                                         sticky=tk.W)
+        self.captureOutputDirVar = tk.StringVar()
+        self.captureOutputDirVar.set('none');
+        self.captureOutputFolder = tk.Entry(self.executionPane, textvariable=self.captureOutputDirVar)
+        self.captureOutputFolder.grid(row=7, column=1, sticky=tk.W + tk.E);
+        selectOutputOutDirButton = tk.Button(self.executionPane, text=Lang.get("Select output directory"),
+                                       command=self.selectCaptureOutputOutDir, **self.getItemStyle())
+        selectOutputOutDirButton.grid(row=7, column=2, sticky=tk.W);
+
+
         self.pad(self.executionPane)
         self.notebook.add(self.executionPane, text=Lang.get('Execution'))
 
@@ -354,16 +367,34 @@ class BatchProcessorGUI (GUIComponent):
             self.outputDir.set(dirName)
             self.outputDirLabel.config(text=self.outputDir.get())
 
+
+    def selectCaptureOutputOutDir(self):
+        """
+        Asks operator for output directory
+        """
+        dirName = tk.filedialog.askdirectory(**self.getOutputDirOptions())
+        if not(dirName):
+            dirName = 'none'
+
+        # set defaults
+        self.setConf('defaultCaptureOutputOutDir', dirName);
+        self.captureOutputDirVar.set(dirName)
+        self.captureOutputFolder.config(text=self.captureOutputDirVar.get())
+
+
+
     def selectSyntaxOutputDir(self):
         """
         Asks operator for output directory
         """
         dirName = tk.filedialog.askdirectory(**self.getSyntaxOutputDirOptions())
-        if dirName:
-            # set defaults
-            self.setConf('defaultSyntaxOutDir', dirName);
-            self.syntaxGenerationDirVar.set(dirName)
-            self.syntaxGenerationFolder.config(text=self.syntaxGenerationDirVar.get())
+        if not(dirName):
+            dirName = 'none'
+
+        # set defaults
+        self.setConf('defaultSyntaxOutDir', dirName);
+        self.syntaxGenerationDirVar.set(dirName)
+        self.syntaxGenerationFolder.config(text=self.syntaxGenerationDirVar.get())
 
 
     def selectSPSSFile(self):
@@ -424,6 +455,7 @@ class BatchProcessorGUI (GUIComponent):
         self.accumulateDataVar.set(self.conf('accumulateData'))
         self.populateSelectedFileList()
         self.syntaxGenerationDirVar.set(self.conf('defaultSyntaxOutDir'))
+        self.captureOutputDirVar.set(self.conf('defaultCaptureOutputOutDir'))
 
 
     def GUIToConfig(self):
@@ -438,6 +470,7 @@ class BatchProcessorGUI (GUIComponent):
         self.setConf('simulateProcessing', self.simulateProcessingVar.get() == 1.0)
         self.setConf('accumulateData', self.accumulateDataVar.get() == 1.0)
         self.setConf('defaultSyntaxOutDir', self.syntaxGenerationDirVar.get() )
+        self.setConf('defaultCaptureOutputOutDir', self.captureOutputDirVar.get())
 
 
     def loadConfig(self):

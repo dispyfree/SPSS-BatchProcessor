@@ -3,12 +3,12 @@
 
 """
 The SPSS Batch Processor is designed to run SPSS/PSPP syntaxes in batch mode. It can accept an arbitrary number of files and applies a given SPSS/PSPP routine to each file individually. Information specific to each subject (it is recommended to have one subject per file) can be extracted from the filename.
-All commands are executed using the command line (PSPP) or line-wise using the SPSS Python API.
+All commands are executed using the command line (PSPP) or using the SPSS Python API.
 
 Author: Valentin Dreismann
 Last modified: 2017
 
-Psychologische Diagnostik. Differentielle Psychologie und Persönlichkeitspsychologie
+Working Group: Psychologische Diagnostik. Differentielle Psychologie und Persönlichkeitspsychologie
 University of Kiel
 """
 
@@ -29,6 +29,8 @@ import time
 import datetime
 import argparse
 import shutil
+
+from contextlib import redirect_stdout
 
 #project imports
 from Lang import Lang
@@ -86,7 +88,8 @@ class BatchProcessor:
 
     def trackProgress(self):
         """
-        Indicates computation progress using progress bar in main window
+        Indicates computation progress using progress bar in main window. Relies on time needed for already processed
+        files; performs linear extrapolation
         """
         alreadyProcessedFiles = 0;
         # keep updating the progress bar
@@ -132,7 +135,7 @@ class BatchProcessor:
             self.err(Lang.get("You did not select any files"));
             return False
 
-        #todo:check whether REGEX matches all files
+        #@todo:check whether REGEX matches all files
         return True
 
 
@@ -151,13 +154,13 @@ class BatchProcessor:
             #if we do not accumulate, choose only one
             if not(self.config.opt['accumulateData']):
                 self.config.opt['inputFiles'] = self.config.opt['inputFiles'][0:1]
-            #otherwise, we need at least two
+            #otherwise (we are accumulating), we need at least two
             else:
                 self.config.opt['inputFiles'] = self.config.opt['inputFiles'][0:2]
 
 
         # we need copy here: we may reload the configuration file and do not want to
-        # remove files permanently.
+        # remove files permanently from the configuration after having processed them once
         inputFilesToUse = self.config.opt['inputFiles'][:]
         self.totalFileNum = 0
 
@@ -311,24 +314,48 @@ class BatchProcessor:
             allCommands.append(command)
             print(Lang.get("Executing: "), command);
 
-        try:
-            pointPlusNewline = '.' + os.linesep
-            debuggingResultQueue.put({'placeholders': config.ObjToJSON(config.opt['placeholders']), 'commands':
-                pointPlusNewline.join(allCommands)});
 
-            BatchProcessor.executor.execute(allCommands)
-        except subprocess.CalledProcessError as e:
-            #halt processing
-            errorQueue.put(e)
-            logQueue.put(Lang.get('Error occurred; execution incomplete'))
-            raise
+        # redirect output
+        # redirecting here will also capture SPSS's errors
+        f = io.StringIO()
+        with redirect_stdout(f):
+            try:
+                pointPlusNewline = '.' + os.linesep
+                debuggingResultQueue.put({'placeholders': config.ObjToJSON(config.opt['placeholders']), 'commands':
+                    pointPlusNewline.join(allCommands)});
 
+                BatchProcessor.executor.execute(allCommands)
+
+            except subprocess.CalledProcessError as e:
+                #halt processing
+                errorQueue.put(e)
+                logQueue.put(Lang.get('Error occurred; execution incomplete'))
+                cls.saveOutputToFile(config, f)
+                raise
+
+        cls.saveOutputToFile(config, f)
         cls.saveCommandsToSyntaxFile(config, allCommands)
 
         usedTime = (time.time() - start_time);
         logQueue.put(Lang.get('Processing finished in {:.2f}s').format(usedTime))
 
         return usedTime;
+
+    @classmethod
+    def saveOutputToFile(cls, config, f):
+        """
+            writes out an individual spss file for each subject; the naming is equivalent to
+            fileName + .log
+            Please note that the toolbox currently does not support the generic generation of those filenames.
+            parameters: configuration as well as a io.StringIO object
+        """
+        outDir = config.opt['defaultCaptureOutputOutDir']
+        if outDir != 'none':
+            origFileName = config.opt['placeholders']['fileName']
+            outFilePath = outDir + '/' + origFileName
+
+            with io.open(outFilePath, 'w+') as file:
+                file.write(f.getvalue())
 
 
     @classmethod

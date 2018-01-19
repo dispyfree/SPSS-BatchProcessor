@@ -6,7 +6,8 @@ class Configuration:
     opt = {'inputSearchPattern': '', 'inputRegexPattern': '', 'outputFilePattern': '', 'outputDir': '',
            'placeholders': '', 'spssFile': '', 'defaultConfigDir': '', 'defaultSPSSDir': '', 'defaultInputDir': '',
            'defaultOutDir': '', 'programVersion': currentVersion, 'simulateProcessing': False,
-           'inputFiles' : [], 'accumulateData' : False, 'accumulationFilePattern' : '', 'defaultSyntaxOutDir' : ''};
+           'inputFiles' : [], 'accumulateData' : False, 'accumulationFilePattern' : '', 'defaultSyntaxOutDir' : '',
+           'defaultCaptureOutputOutDir' : ''};
     reservedPlaceholders = opt.keys();
 
     """
@@ -103,6 +104,13 @@ class Configuration:
     will be generated
     """
     opt['defaultSyntaxOutDir'] = 'none'
+
+    """
+    Defines the directory to use for writing out the output of SPSS
+    If not 'none' but a directory, for each input file "fileName.ext", a corresponding syntax file "fileName.log" 
+    will be generated
+    """
+    opt['defaultCaptureOutputOutDir'] = 'none'
 
 
     """
