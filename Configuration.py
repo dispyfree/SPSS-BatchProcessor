@@ -7,7 +7,7 @@ class Configuration:
            'placeholders': '', 'spssFile': '', 'defaultConfigDir': '', 'defaultSPSSDir': '', 'defaultInputDir': '',
            'defaultOutDir': '', 'programVersion': currentVersion, 'simulateProcessing': False,
            'inputFiles' : [], 'accumulateData' : False, 'accumulationFilePattern' : '', 'defaultSyntaxOutDir' : '',
-           'defaultCaptureOutputOutDir' : ''};
+           'defaultCaptureOutputOutDir' : '', 'checkFileSizes' : False};
     reservedPlaceholders = opt.keys();
 
     """
@@ -112,11 +112,16 @@ class Configuration:
     """
     opt['defaultCaptureOutputOutDir'] = 'none'
 
+    """
+    Checks file sizes of output files and redoes those whose filesize deviates by more than 20% (to the bottom) of the file size average. 
+    """
+    opt['checkFileSizes'] = False
+
 
     """
     Template for merging/accumulating data files
     """
-    accumulationFileTemplate = 'C:/Users/admin/Documents/valentin/BatchProcessor/workflow/Schritt_2_Zusammenfügen_der_SavDateien.sps'
+    accumulationFileTemplate = 'Z:/Mitarbeiter/lukas_christian/SPSS-Auswertung/workflow/Schritt_2_Zusammenfügen_der_SavDateien.sps'
 
     def getCurrentVersion(self):
         return self.currentVersion;

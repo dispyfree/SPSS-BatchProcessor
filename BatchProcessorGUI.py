@@ -269,6 +269,13 @@ class BatchProcessorGUI (GUIComponent):
         selectOutputOutDirButton.grid(row=7, column=2, sticky=tk.W);
 
 
+        tk.Label(self.executionPane, text=Lang.get("Check Filesizes"), **self.getItemStyle()).grid(row=8,
+                                                                                                  column=0,
+                                                                                                  sticky=tk.W)
+        self.checkFileSizeVar = tk.BooleanVar()
+        self.checkFilesizesButton = tk.Checkbutton(self.executionPane, text = Lang.get('Reprocess files if deviation exceeds 20%'), variable=self.checkFileSizeVar, **self.getItemStyle())
+        self.checkFilesizesButton.grid(row = 8, column = 1, sticky = tk.W)
+
         self.pad(self.executionPane)
         self.notebook.add(self.executionPane, text=Lang.get('Execution'))
 
@@ -456,6 +463,7 @@ class BatchProcessorGUI (GUIComponent):
         self.populateSelectedFileList()
         self.syntaxGenerationDirVar.set(self.conf('defaultSyntaxOutDir'))
         self.captureOutputDirVar.set(self.conf('defaultCaptureOutputOutDir'))
+        self.checkFileSizeVar.set(self.conf('checkFileSizes'))
 
 
     def GUIToConfig(self):
@@ -471,6 +479,7 @@ class BatchProcessorGUI (GUIComponent):
         self.setConf('accumulateData', self.accumulateDataVar.get() == 1.0)
         self.setConf('defaultSyntaxOutDir', self.syntaxGenerationDirVar.get() )
         self.setConf('defaultCaptureOutputOutDir', self.captureOutputDirVar.get())
+        #self.setConf('checkFileSizes', self.checkFileSizeVar.get())
 
 
     def loadConfig(self):

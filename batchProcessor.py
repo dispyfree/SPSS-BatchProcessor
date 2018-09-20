@@ -76,13 +76,21 @@ class BatchProcessor:
                 self.showDebuggingInformation(debuggingInfo)
             except queue.Empty as e:
                 pass
+        else:
+            # give SPSS a few seconds to complete last file ...
+            time.sleep(3)
+            filesToRedo = self.spotOutputFileSizeAberrations()
 
-        # transfer information from queue to log (i.e. workers => backend)
-        self.transferLogQueue()
-        completedMsg = Lang.get('Processing for {} files completed in {:.2f} seconds').format(
-            len(self.config.opt['inputFiles']), totalUsedTime)
-        self.executionLog.append(completedMsg)
-        tk.messagebox.showinfo(Lang.get('Processing completed'), completedMsg);
+            if(len(filesToRedo) == 0):
+                # transfer information from queue to log (i.e. workers => backend)
+                self.transferLogQueue()
+                completedMsg = Lang.get('Processing for {} files completed in {:.2f} seconds').format(
+                    len(self.config.opt['inputFiles']), totalUsedTime)
+                self.executionLog.append(completedMsg)
+                tk.messagebox.showinfo(Lang.get('Processing completed'), completedMsg);
+            else:
+                tk.messagebox.showinfo(Lang.get('Incomplete Files detected'), Lang.get('Detected filesize aberration. Reprocessing incomplete files ...'))
+                self.redoIncompleteFiles(filesToRedo)
 
 
 
@@ -147,6 +155,10 @@ class BatchProcessor:
         self.executionLog.append(Lang.get('Configuration dump: ') + os.linesep + self.config.toJSON())
         self.executionLog.append( os.linesep + Lang.get('Execution log:'))
 
+        # keep track of files output by SPSS
+        # used to spot aberrations in filesize
+        self.outputFilePaths = []
+        self.inputFilePaths  = []
 
         #for debugging, only very first file will be processed
         if(self.config.opt['simulateProcessing']):
@@ -179,7 +191,38 @@ class BatchProcessor:
             # parsing it to JSON and converting back works just fine.
             configStr = self.config.toJSON();
             self.queue.put([filePath, outputFilePath, configStr]);
+
+            # reconstruct file output path
+            # used to spot aberrations in file size after processing
+            self.outputFilePaths.append(outputFilePath)
+            self.inputFilePaths.append(filePath)
+
             self.totalFileNum += 1
+
+
+
+    def spotOutputFileSizeAberrations(self):
+        """
+            computes file size histogram and 'spots' all files whose filesize deviates by more than x% from the mean.
+        :return: indices of files to redo
+        """
+        # 20%
+        deviationThreshold = 0.2
+
+        fileSizeHist = [os.path.getsize(filePath) for filePath in self.outputFilePaths]
+        avgFileSize = sum(fileSizeHist) / float(len(fileSizeHist))
+        isOutlier = lambda fileSize : (fileSize / avgFileSize) < (1 - deviationThreshold)
+
+        filesToRedo = [i for i in range(0, len(fileSizeHist)) if isOutlier(fileSizeHist[i])]
+
+        return filesToRedo
+
+
+
+    def redoIncompleteFiles(self, inputFileIndices):
+        filesToRedo = [self.inputFilePaths[i] for i in inputFileIndices]
+        self.config.opt['inputFiles'] = filesToRedo
+        self.runProcessing()
 
 
 
@@ -239,16 +282,52 @@ class BatchProcessor:
         :param config: key 'spssFile' will be used
         :return: list of commands
         """
-        with io.open(config.opt['spssFile'], "r", encoding='utf8') as f:
+        with io.open(config.opt['spssFile'], "r+b") as f:
             if(f == None):
                 cls.err(Lang.get("Unable to obtain file handle for SPSS file"))
             else:
                 spssCommands = f.read()
-        #by definition, commands end with "." and a newline
-        #@todo: check if there's a way to catch \n and \r\n simultaneously
-        spssCommands = spssCommands.split(".\n");
-        return spssCommands
 
+                # remove BOM byte, should it be there
+                spssCommands = spssCommands.decode("utf-8-sig")
+
+        usesWindowsNewlines = "\r\n" in spssCommands
+
+        #by definition, commands end with "." and a newline
+        if not(usesWindowsNewlines):
+            spssCommands = spssCommands.split("\n");
+        else:
+            spssCommands = spssCommands.split("\r\n");
+
+        spssCommands = BatchProcessor.removeCommentsFromCommands(spssCommands)
+        return BatchProcessor.mergeLinesIntoCommands(spssCommands)
+
+    @staticmethod
+    def removeCommentsFromCommands(commands):
+        ret = []
+        for command in commands:
+            command = command.strip()
+            if(len(command) > 0 and command[0] != '*'):
+                ret.append(command)
+        return ret
+
+    @staticmethod
+    def mergeLinesIntoCommands(lines):
+        """
+        A command may span several lines; merge parts from several lines into point-separated commands
+        :return: array of commands where each line corresponds to a command.
+        """
+        currentCommand = ""
+        ret = []
+
+        for line in lines:
+            currentCommand += " "
+            currentCommand += line
+            if(line[-1] == '.'):
+                ret.append(currentCommand)
+                currentCommand = ""
+
+        return ret
 
 
     @classmethod
@@ -318,20 +397,23 @@ class BatchProcessor:
         # redirect output
         # redirecting here will also capture SPSS's errors
         f = io.StringIO()
-        with redirect_stdout(f):
-            try:
-                pointPlusNewline = '.' + os.linesep
-                debuggingResultQueue.put({'placeholders': config.ObjToJSON(config.opt['placeholders']), 'commands':
-                    pointPlusNewline.join(allCommands)});
+        outDir = config.opt['defaultCaptureOutputOutDir']
+        if outDir != 'none':
+            redirect_stdout(f);
+        #try:
+        pointPlusNewline = '.' + os.linesep
+        debuggingResultQueue.put({'placeholders': config.ObjToJSON(config.opt['placeholders']), 'commands':
+            pointPlusNewline.join(allCommands)});
 
-                BatchProcessor.executor.execute(allCommands)
+        if(not(config.opt['simulateProcessing'])):
+            BatchProcessor.executor.execute(allCommands)
 
-            except subprocess.CalledProcessError as e:
-                #halt processing
-                errorQueue.put(e)
-                logQueue.put(Lang.get('Error occurred; execution incomplete'))
-                cls.saveOutputToFile(config, f)
-                raise
+        #except subprocess.CalledProcessError as e:
+            #halt processing
+            #errorQueue.put(e)
+            #logQueue.put(Lang.get('Error occurred; execution incomplete'))
+            #cls.saveOutputToFile(config, f)
+        #raise
 
         cls.saveOutputToFile(config, f)
         cls.saveCommandsToSyntaxFile(config, allCommands)

@@ -88,12 +88,12 @@ class MainWindow (GUIComponent):
         if not(os.path.isfile(expandedFileName)):
             self.state = self.userStateDefaults
         else:
-            try:
-                file = open(expandedFileName, 'r')
-                self.state =  json.load(file);
-                file.close()
-            except:
-                self.err('Unable to load user state file')
+            #try:
+            file = open(expandedFileName, 'r')
+            self.state =  json.load(file);
+            file.close()
+            #except:
+                #self.err('Unable to load user state file')
 
 
     def saveUserState(self):
@@ -221,10 +221,10 @@ def SPSSWorkerProcess(logQueue, taskQueue, debuggingResultQueue, errorQueue):
         [inputFilePath, outputFilePath, configStr] = job;
         config = Configuration()
         config.loadFromString(configStr);
-        try:
-            BatchProcessor.runSPSSProcessOnFile(inputFilePath, outputFilePath, config, logQueue, debuggingResultQueue, errorQueue);
-        except Exception as e:
-            BatchProcessorGUI.handleExecutionError(e, taskQueue, debuggingResultQueue, errorQueue)
+        #try:
+        BatchProcessor.runSPSSProcessOnFile(inputFilePath, outputFilePath, config, logQueue, debuggingResultQueue, errorQueue);
+        #except Exception as e:
+            #BatchProcessorGUI.handleExecutionError(e, taskQueue, debuggingResultQueue, errorQueue)
 
 
 def main():

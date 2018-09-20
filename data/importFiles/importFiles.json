@@ -1,17 +1,20 @@
 {
     "accumulateData": false,
     "accumulationFilePattern": "(?P<fileName>[\\w]*).sav",
-    "defaultConfigDir": "D:/lib/BatchProcessor/data/importFiles",
-    "defaultInputDir": "D:/lib/BatchProcessor/data/importFiles/in",
-    "defaultOutDir": "D:/lib/BatchProcessor/data/importFiles/out",
-    "defaultSPSSDir": "D:/lib/BatchProcessor/data/importFiles",
+    "checkFileSizes": true,
+    "defaultCaptureOutputOutDir": "none",
+    "defaultConfigDir": ".",
+    "defaultInputDir": "D:/lib/SPSS-BatchProcessor/data/importFiles/in",
+    "defaultOutDir": "D:/lib/SPSS-BatchProcessor/data/importFiles/out",
+    "defaultSPSSDir": "D:/lib/SPSS-BatchProcessor/data/importFiles",
+    "defaultSyntaxOutDir": "none",
     "inputFiles": [
-        "D:/lib/BatchProcessor/data/importFiles/in/data.csv"
+        "D:/lib/SPSS-BatchProcessor/data/importFiles/in/data.csv"
     ],
-    "inputRegexPattern": "(?P<fileName1>[\\w]*).csv",
-    "inputSearchPattern": ".txt",
-    "outputDir": "D:/lib/BatchProcessor/data/importFiles/out",
-    "outputFilePattern": "<fileName1>.sav",
+    "inputRegexPattern": "(?P<fileName>[\\w]*).csv",
+    "inputSearchPattern": ".csv",
+    "outputDir": "D:/lib/SPSS-BatchProcessor/data/importFiles/out",
+    "outputFilePattern": "<fileName>.sav",
     "placeholders": {
         "DUMMY": "DUMMY",
         "INFILE": "",
@@ -19,5 +22,5 @@
     },
     "programVersion": 0.8,
     "simulateProcessing": false,
-    "spssFile": "D:/lib/BatchProcessor/data/importFiles/importFilesSPSS.sps"
+    "spssFile": "D:/lib/SPSS-BatchProcessor/data/importFiles/importFilesSPSS.sps"
 }
